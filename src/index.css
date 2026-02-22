@@ -1,68 +1,39 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@theme {
+  --color-primary: #0EA5E9;
+  --color-secondary: #F59E0B;
+  --color-accent: #FDE047;
+  --color-background-light: #ffffff;
+  --color-background-alt: #f8fafc;
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  --font-display: "Spline Sans", sans-serif;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  --radius: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-marquee: marquee 30s linear infinite;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
   }
-  a:hover {
-    color: #747bff;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
   }
-  button {
-    background-color: #f9f9f9;
+  100% {
+    transform: translateX(-50%);
   }
+}
+
+.hover\:pause:hover {
+  animation-play-state: paused;
 }
