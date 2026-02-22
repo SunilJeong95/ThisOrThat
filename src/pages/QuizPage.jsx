@@ -12,122 +12,316 @@ const USER_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1uLzjl
 const questions = [
   {
     id: 1,
-    label: 'Controversial',
-    labelIcon: 'local_fire_department',
-    labelColor: 'text-orange-500',
-    title: 'Pineapple on Pizza?',
-    description: 'Culinary genius or a crime against humanity? 🍍🍕',
-    type: 'image',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD4OUaCipBza5iXhrzVyKy1yq0FX2MInPuiyWpBg105qquXdIF-rptL8JFz-k1LXUB7kDxB3E9HauMsAsXAIplh5_ek8QTKjsRoF5y-KqPmvblD-FEaATv0dcnYNu9cfyMYozp7f-tRlA0tL1bQgfBpohi81hhRMJy6JXhcfPliJ-I5vPYzrJY7DXcHl1ry5t8yX6VYu6NBeRDieuzOMG3pvvClJbXg497_wU6vO6Qh28u_SljQ8I-OFmhhbo4D3WaQfHSYe2_weLgu',
-    votes: '12.5k',
+    label: 'The Great Debate',
+    labelIcon: 'priority_high',
+    labelColor: 'text-amber-500',
+    title: 'Toilet Paper: Over or Under?',
+    description: 'A question that has ended friendships and started wars. Which way do you hang it? 🧻',
+    type: 'svg',
+    svgBg: 'from-amber-100 via-yellow-50 to-orange-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        <rect x="80" y="30" width="40" height="140" rx="8" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="2"/>
+        <circle cx="100" cy="30" r="16" fill="#e5e7eb" stroke="#d1d5db" strokeWidth="2"/>
+        <circle cx="100" cy="30" r="6" fill="#9ca3af"/>
+        {/* paper roll */}
+        <rect x="86" y="46" width="28" height="100" rx="4" fill="#fef3c7"/>
+        {/* over flap */}
+        <path d="M100 46 Q120 60 114 80 Q108 60 100 54 Z" fill="#fde68a" stroke="#fbbf24" strokeWidth="1"/>
+        {/* lines on paper */}
+        <line x1="90" y1="60" x2="110" y2="60" stroke="#fbbf24" strokeWidth="1.5" opacity="0.5"/>
+        <line x1="90" y1="70" x2="110" y2="70" stroke="#fbbf24" strokeWidth="1.5" opacity="0.5"/>
+        <line x1="90" y1="80" x2="110" y2="80" stroke="#fbbf24" strokeWidth="1.5" opacity="0.5"/>
+      </svg>
+    ),
+    votes: '14.2k',
   },
   {
     id: 2,
-    label: 'Fashion Crime',
-    labelIcon: 'style',
-    labelColor: 'text-purple-600',
-    title: 'Socks with Sandals?',
-    description: 'Ultimate comfort or fashion apocalypse? 🧦👡',
-    type: 'emoji',
-    emoji: '🧦',
-    gradient: 'from-purple-200 via-violet-100 to-indigo-200',
-    votes: '8.3k',
+    label: 'Bold Claim',
+    labelIcon: 'wc',
+    labelColor: 'text-blue-500',
+    title: 'Bathroom: Sit or Stand?',
+    description: 'Some routines are done seated. Some people prefer to stand. No judgment here. 🚽',
+    type: 'svg',
+    svgBg: 'from-blue-100 via-sky-50 to-cyan-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* toilet */}
+        <ellipse cx="100" cy="155" rx="44" ry="18" fill="#e5e7eb" stroke="#d1d5db" strokeWidth="2"/>
+        <rect x="58" y="100" width="84" height="58" rx="16" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="2"/>
+        <ellipse cx="100" cy="100" rx="42" ry="12" fill="#e5e7eb" stroke="#d1d5db" strokeWidth="2"/>
+        {/* seat */}
+        <path d="M70 100 Q100 120 130 100 Q130 118 100 128 Q70 118 70 100Z" fill="#d1d5db" opacity="0.6"/>
+        {/* tank */}
+        <rect x="74" y="60" width="52" height="44" rx="8" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="2"/>
+        <rect x="80" y="54" width="40" height="10" rx="4" fill="#e5e7eb" stroke="#d1d5db" strokeWidth="1.5"/>
+        {/* button */}
+        <circle cx="100" cy="66" r="5" fill="#9ca3af"/>
+      </svg>
+    ),
+    votes: '9.8k',
   },
   {
     id: 3,
-    label: 'Night Ritual',
-    labelIcon: 'bedtime',
-    labelColor: 'text-blue-600',
-    title: 'Sleeping with Socks On?',
-    description: 'Warm feet = better sleep? Or absolute chaos? 🧦😴',
-    type: 'emoji',
-    emoji: '😴',
-    gradient: 'from-blue-200 via-sky-100 to-indigo-200',
-    votes: '9.1k',
+    label: 'Tube Terror',
+    labelIcon: 'emergency',
+    labelColor: 'text-green-500',
+    title: 'Toothpaste: Bottom or Middle?',
+    description: 'Methodical bottom-squeezer or a chaotic middle-crusher? This says everything. 🪥',
+    type: 'svg',
+    svgBg: 'from-green-100 via-emerald-50 to-teal-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* tube body */}
+        <rect x="70" y="50" width="60" height="110" rx="10" fill="#a7f3d0" stroke="#34d399" strokeWidth="2"/>
+        {/* crimp bottom - neat */}
+        <rect x="72" y="148" width="56" height="12" rx="3" fill="#6ee7b7" stroke="#34d399" strokeWidth="1.5"/>
+        {/* cap */}
+        <rect x="84" y="38" width="32" height="16" rx="6" fill="#34d399"/>
+        <rect x="90" y="30" width="20" height="12" rx="4" fill="#059669"/>
+        {/* label */}
+        <rect x="78" y="80" width="44" height="40" rx="4" fill="white" opacity="0.5"/>
+        <line x1="82" y1="92" x2="118" y2="92" stroke="#34d399" strokeWidth="2"/>
+        <line x1="82" y1="100" x2="108" y2="100" stroke="#34d399" strokeWidth="2"/>
+        {/* toothpaste squirt */}
+        <path d="M100 38 Q105 20 112 14 Q108 22 116 18" stroke="#34d399" strokeWidth="3" fill="none" strokeLinecap="round"/>
+      </svg>
+    ),
+    votes: '7.3k',
   },
   {
     id: 4,
-    label: 'Social Experiment',
-    labelIcon: 'flight',
-    labelColor: 'text-sky-600',
-    title: 'Talking to Strangers on Planes?',
-    description: 'Networking opportunity or please don\'t talk to me? ✈️🤫',
-    type: 'emoji',
-    emoji: '✈️',
-    gradient: 'from-sky-200 via-cyan-100 to-teal-200',
-    votes: '15.2k',
+    label: 'Controversial',
+    labelIcon: 'local_fire_department',
+    labelColor: 'text-orange-500',
+    title: 'Pineapple on Pizza: Yes or No?',
+    description: 'Tropical genius or a crime against Italian culture? Pick your side. 🍍🍕',
+    type: 'svg',
+    svgBg: 'from-yellow-100 via-orange-50 to-red-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* pizza base */}
+        <circle cx="100" cy="110" r="72" fill="#fbbf24"/>
+        <circle cx="100" cy="110" r="62" fill="#f97316"/>
+        {/* cheese */}
+        <circle cx="100" cy="110" r="52" fill="#fef08a"/>
+        {/* crust */}
+        <circle cx="100" cy="110" r="72" fill="none" stroke="#d97706" strokeWidth="8"/>
+        {/* pineapple chunks */}
+        <rect x="86" y="94" width="16" height="14" rx="3" fill="#fde047" stroke="#eab308" strokeWidth="1.5"/>
+        <rect x="108" y="104" width="14" height="12" rx="3" fill="#fde047" stroke="#eab308" strokeWidth="1.5"/>
+        <rect x="80" y="114" width="14" height="12" rx="3" fill="#fde047" stroke="#eab308" strokeWidth="1.5"/>
+        {/* pepperoni */}
+        <circle cx="88" cy="118" r="7" fill="#dc2626" opacity="0.8"/>
+        <circle cx="112" cy="96" r="7" fill="#dc2626" opacity="0.8"/>
+        {/* pineapple top */}
+        <path d="M90 94 Q94 84 98 80 Q96 86 100 82 Q100 88 102 84 Q104 90 94 92Z" fill="#4ade80"/>
+      </svg>
+    ),
+    votes: '18.5k',
   },
   {
     id: 5,
-    label: 'Breakfast War',
-    labelIcon: 'emoji_food_beverage',
-    labelColor: 'text-amber-600',
-    title: 'Milk Before Cereal?',
-    description: 'The ancient debate that divides families. 🥛🥣',
-    type: 'emoji',
-    emoji: '🥣',
-    gradient: 'from-amber-200 via-yellow-100 to-orange-100',
-    votes: '20.7k',
+    label: 'Daily Ritual',
+    labelIcon: 'wb_sunny',
+    labelColor: 'text-sky-500',
+    title: 'Shower: Morning or Night?',
+    description: 'Start the day fresh or wash off the world before bed? The eternal hygiene debate. 🚿',
+    type: 'svg',
+    svgBg: 'from-sky-100 via-blue-50 to-indigo-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* shower head pipe */}
+        <rect x="94" y="30" width="8" height="50" rx="4" fill="#94a3b8"/>
+        {/* shower head */}
+        <ellipse cx="98" cy="82" rx="28" ry="10" fill="#64748b"/>
+        <ellipse cx="98" cy="78" rx="28" ry="10" fill="#94a3b8"/>
+        {/* water drops */}
+        <ellipse cx="80" cy="105" rx="3" ry="6" fill="#7dd3fc" opacity="0.8"/>
+        <ellipse cx="90" cy="112" rx="3" ry="6" fill="#7dd3fc" opacity="0.8"/>
+        <ellipse cx="100" cy="104" rx="3" ry="6" fill="#7dd3fc" opacity="0.8"/>
+        <ellipse cx="110" cy="113" rx="3" ry="6" fill="#7dd3fc" opacity="0.8"/>
+        <ellipse cx="120" cy="104" rx="3" ry="6" fill="#7dd3fc" opacity="0.8"/>
+        <ellipse cx="85" cy="125" rx="3" ry="6" fill="#7dd3fc" opacity="0.6"/>
+        <ellipse cx="105" cy="128" rx="3" ry="6" fill="#7dd3fc" opacity="0.6"/>
+        {/* sun */}
+        <circle cx="155" cy="50" r="18" fill="#fde047"/>
+        {/* sun rays */}
+        {[0,45,90,135,180,225,270,315].map((angle, i) => {
+          const rad = (angle * Math.PI) / 180
+          return <line key={i} x1={155 + 22*Math.cos(rad)} y1={50 + 22*Math.sin(rad)} x2={155 + 30*Math.cos(rad)} y2={50 + 30*Math.sin(rad)} stroke="#fde047" strokeWidth="3" strokeLinecap="round"/>
+        })}
+        {/* moon */}
+        <path d="M42 55 Q55 45 62 55 Q50 75 42 55Z" fill="#c7d2fe"/>
+        <circle cx="52" cy="48" r="3" fill="#818cf8"/>
+      </svg>
+    ),
+    votes: '11.4k',
   },
   {
     id: 6,
-    label: 'Comfort Mode',
-    labelIcon: 'tv',
+    label: 'Wake-Up Style',
+    labelIcon: 'alarm',
     labelColor: 'text-rose-500',
-    title: 'Rewatching Instead of New Shows?',
-    description: 'Cozy familiarity or wasted opportunity? 📺🔄',
-    type: 'emoji',
-    emoji: '📺',
-    gradient: 'from-rose-200 via-pink-100 to-red-100',
-    votes: '18.4k',
+    title: 'Alarm: One Shot or Snooze Marathon?',
+    description: 'First alarm, out of bed. Or do you negotiate 10 more minutes five times? ⏰',
+    type: 'svg',
+    svgBg: 'from-rose-100 via-pink-50 to-red-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* clock body */}
+        <circle cx="100" cy="105" r="60" fill="#f3f4f6" stroke="#e5e7eb" strokeWidth="3"/>
+        <circle cx="100" cy="105" r="54" fill="white" stroke="#e5e7eb" strokeWidth="1"/>
+        {/* alarm feet */}
+        <ellipse cx="70" cy="162" rx="12" ry="6" fill="#e5e7eb"/>
+        <ellipse cx="130" cy="162" rx="12" ry="6" fill="#e5e7eb"/>
+        {/* alarm bells */}
+        <circle cx="65" cy="58" r="14" fill="#fb7185" stroke="#f43f5e" strokeWidth="2"/>
+        <circle cx="135" cy="58" r="14" fill="#fb7185" stroke="#f43f5e" strokeWidth="2"/>
+        {/* bell detail */}
+        <line x1="65" y1="50" x2="65" y2="66" stroke="#f43f5e" strokeWidth="2"/>
+        <line x1="135" y1="50" x2="135" y2="66" stroke="#f43f5e" strokeWidth="2"/>
+        {/* clock hands */}
+        <line x1="100" y1="105" x2="100" y2="68" stroke="#1e293b" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="100" y1="105" x2="128" y2="105" stroke="#1e293b" strokeWidth="3" strokeLinecap="round"/>
+        <circle cx="100" cy="105" r="5" fill="#0ea5e9"/>
+        {/* hour markers */}
+        {[0,30,60,90,120,150,180,210,240,270,300,330].map((angle, i) => {
+          const rad = (angle * Math.PI) / 180
+          const len = i % 3 === 0 ? 8 : 4
+          return <line key={i} x1={100+46*Math.cos(rad-Math.PI/2)} y1={105+46*Math.sin(rad-Math.PI/2)} x2={100+(46-len)*Math.cos(rad-Math.PI/2)} y2={105+(46-len)*Math.sin(rad-Math.PI/2)} stroke="#cbd5e1" strokeWidth={i%3===0?2:1}/>
+        })}
+      </svg>
+    ),
+    votes: '13.7k',
   },
   {
     id: 7,
-    label: 'Eating Ritual',
-    labelIcon: 'lunch_dining',
-    labelColor: 'text-orange-600',
-    title: 'Eating the Crust First?',
-    description: 'Save the best for last or get it out of the way? 🍕🔄',
-    type: 'emoji',
-    emoji: '🍕',
-    gradient: 'from-orange-200 via-amber-100 to-yellow-100',
-    votes: '7.6k',
+    label: 'Viewing Habit',
+    labelIcon: 'subtitles',
+    labelColor: 'text-purple-500',
+    title: 'Subtitles: Always On or Always Off?',
+    description: 'Do you read while you watch, or does text on screen drive you absolutely crazy? 📺',
+    type: 'svg',
+    svgBg: 'from-purple-100 via-violet-50 to-indigo-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* TV body */}
+        <rect x="30" y="45" width="140" height="100" rx="12" fill="#1e293b"/>
+        <rect x="38" y="52" width="124" height="86" rx="6" fill="#0f172a"/>
+        {/* screen content */}
+        <rect x="42" y="56" width="116" height="78" rx="4" fill="#1e293b"/>
+        {/* movie scene lines */}
+        <line x1="50" y1="70" x2="100" y2="70" stroke="#475569" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="50" y1="80" x2="130" y2="80" stroke="#475569" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="50" y1="90" x2="90" y2="90" stroke="#475569" strokeWidth="2" strokeLinecap="round"/>
+        {/* subtitle bar */}
+        <rect x="44" y="112" width="112" height="18" rx="3" fill="#7c3aed" opacity="0.85"/>
+        <rect x="52" y="116" width="70" height="6" rx="2" fill="white" opacity="0.9"/>
+        <rect x="52" y="120" width="50" height="4" rx="2" fill="white" opacity="0.6"/>
+        {/* TV stand */}
+        <rect x="88" y="144" width="24" height="16" rx="2" fill="#334155"/>
+        <rect x="72" y="158" width="56" height="6" rx="3" fill="#334155"/>
+        {/* TV buttons */}
+        <circle cx="148" cy="95" r="4" fill="#475569"/>
+        <circle cx="148" cy="107" r="4" fill="#475569"/>
+      </svg>
+    ),
+    votes: '16.2k',
   },
   {
     id: 8,
-    label: 'Morning Person?',
-    labelIcon: 'wb_sunny',
-    labelColor: 'text-teal-600',
-    title: 'Making Your Bed Every Day?',
-    description: 'Productive habit or pointless chore? 🛏️✨',
-    type: 'emoji',
-    emoji: '🛏️',
-    gradient: 'from-teal-200 via-emerald-100 to-green-100',
-    votes: '22.1k',
+    label: 'Number Brain',
+    labelIcon: 'volume_up',
+    labelColor: 'text-teal-500',
+    title: 'TV Volume: Multiple of 5 or Random?',
+    description: 'Does volume 17 give you anxiety? Or do you not even look at the number? 🔊',
+    type: 'svg',
+    svgBg: 'from-teal-100 via-cyan-50 to-green-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* speaker */}
+        <rect x="60" y="70" width="44" height="60" rx="6" fill="#334155"/>
+        <rect x="66" y="76" width="32" height="48" rx="4" fill="#1e293b"/>
+        <circle cx="82" cy="100" r="16" fill="#0f172a"/>
+        <circle cx="82" cy="100" r="10" fill="#1e293b"/>
+        <circle cx="82" cy="100" r="4" fill="#94a3b8"/>
+        {/* sound waves */}
+        <path d="M110 88 Q122 100 110 112" stroke="#2dd4bf" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        <path d="M118 80 Q136 100 118 120" stroke="#2dd4bf" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M126 72 Q150 100 126 128" stroke="#2dd4bf" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.4"/>
+        {/* volume number display */}
+        <rect x="56" y="140" width="88" height="30" rx="8" fill="#0f172a" stroke="#334155" strokeWidth="2"/>
+        <text x="100" y="161" textAnchor="middle" fill="#2dd4bf" fontFamily="monospace" fontSize="18" fontWeight="bold">15</text>
+      </svg>
+    ),
+    votes: '8.9k',
   },
   {
     id: 9,
-    label: 'Privacy Mode',
-    labelIcon: 'phone_android',
-    labelColor: 'text-slate-600',
-    title: 'Phone Face-Down in Public?',
-    description: 'Privacy habit or just suspicious behavior? 📱🙈',
-    type: 'emoji',
-    emoji: '📱',
-    gradient: 'from-slate-200 via-gray-100 to-zinc-100',
-    votes: '11.9k',
+    label: 'Storage Wars',
+    labelIcon: 'kitchen',
+    labelColor: 'text-red-500',
+    title: 'Ketchup: Fridge or Cupboard?',
+    description: 'Cold ketchup straight from the fridge, or room temperature from the shelf? 🍅',
+    type: 'svg',
+    svgBg: 'from-red-100 via-rose-50 to-orange-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* bottle body */}
+        <path d="M80 170 L80 110 Q80 90 90 80 L90 60 L110 60 L110 80 Q120 90 120 110 L120 170 Z" fill="#dc2626"/>
+        {/* bottle highlight */}
+        <path d="M85 170 L85 115 Q85 95 93 85 L93 62 L98 62 L98 85 Q90 95 90 115 L90 170 Z" fill="#ef4444" opacity="0.5"/>
+        {/* neck */}
+        <rect x="88" y="44" width="24" height="18" rx="4" fill="#b91c1c"/>
+        {/* cap */}
+        <rect x="84" y="36" width="32" height="12" rx="5" fill="#991b1b"/>
+        {/* label */}
+        <rect x="82" y="105" width="36" height="44" rx="4" fill="white" opacity="0.9"/>
+        {/* tomato icon on label */}
+        <circle cx="100" cy="120" r="10" fill="#ef4444"/>
+        <path d="M96 110 Q100 104 104 110" stroke="#16a34a" strokeWidth="2" fill="none"/>
+        <line x1="100" y1="104" x2="100" y2="110" stroke="#16a34a" strokeWidth="2"/>
+        {/* lines on label */}
+        <line x1="86" y1="135" x2="114" y2="135" stroke="#dc2626" strokeWidth="1.5" opacity="0.4"/>
+        <line x1="88" y1="140" x2="112" y2="140" stroke="#dc2626" strokeWidth="1.5" opacity="0.3"/>
+      </svg>
+    ),
+    votes: '10.1k',
   },
   {
     id: 10,
-    label: 'Solo Concert',
-    labelIcon: 'music_note',
-    labelColor: 'text-pink-500',
-    title: 'Singing in the Shower?',
-    description: 'Grammy performance or noise complaint waiting to happen? 🚿🎤',
-    type: 'emoji',
-    emoji: '🎤',
-    gradient: 'from-pink-200 via-rose-100 to-fuchsia-100',
-    votes: '31.5k',
+    label: 'Night Mode',
+    labelIcon: 'bedtime',
+    labelColor: 'text-indigo-500',
+    title: 'Socks On or Off in Bed?',
+    description: 'Warm-feet disciples vs. bare-foot-freedom sleepers. The bedtime identity crisis. 🧦',
+    type: 'svg',
+    svgBg: 'from-indigo-100 via-blue-50 to-slate-100',
+    svg: (
+      <svg viewBox="0 0 200 200" className="w-40 h-40 drop-shadow-xl">
+        {/* sock shape */}
+        <path d="M68 50 L68 130 Q68 155 90 160 L130 160 Q148 160 148 142 Q148 128 132 126 L120 124 L120 50 Z" fill="#6366f1" stroke="#4f46e5" strokeWidth="2"/>
+        {/* sock cuff */}
+        <rect x="68" y="50" width="52" height="20" rx="4" fill="#818cf8"/>
+        {/* cuff stripes */}
+        <line x1="68" y1="58" x2="120" y2="58" stroke="#a5b4fc" strokeWidth="2"/>
+        <line x1="68" y1="64" x2="120" y2="64" stroke="#a5b4fc" strokeWidth="2"/>
+        {/* toe highlight */}
+        <ellipse cx="128" cy="143" rx="20" ry="12" fill="#818cf8" opacity="0.5"/>
+        {/* heel highlight */}
+        <ellipse cx="80" cy="148" rx="16" ry="10" fill="#818cf8" opacity="0.4"/>
+        {/* moon & stars */}
+        <path d="M155 50 Q165 40 170 50 Q160 68 155 50Z" fill="#fde047"/>
+        <circle cx="148" cy="36" r="3" fill="#fde047" opacity="0.8"/>
+        <circle cx="162" cy="30" r="2" fill="#fde047" opacity="0.6"/>
+        <circle cx="174" cy="42" r="2" fill="#fde047" opacity="0.5"/>
+        <circle cx="40" cy="130" r="3" fill="#a5b4fc" opacity="0.6"/>
+        <circle cx="50" cy="118" r="2" fill="#a5b4fc" opacity="0.4"/>
+      </svg>
+    ),
+    votes: '19.3k',
   },
 ]
 
@@ -310,13 +504,17 @@ export default function QuizPage() {
               transition: 'transform 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.38s ease',
             }}
           >
-            {/* Image / emoji area */}
+            {/* Image / emoji / svg area */}
             <div className="relative flex-1 overflow-hidden">
               {question.type === 'image' ? (
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                   style={{ backgroundImage: `url('${question.image}')` }}
                 />
+              ) : question.type === 'svg' ? (
+                <div className={`absolute inset-0 bg-gradient-to-br ${question.svgBg} flex items-center justify-center`}>
+                  {question.svg}
+                </div>
               ) : (
                 <div className={`absolute inset-0 bg-gradient-to-br ${question.gradient} flex items-center justify-center`}>
                   <span className="text-[120px] md:text-[150px] select-none leading-none drop-shadow-sm">
@@ -355,14 +553,6 @@ export default function QuizPage() {
             </div>
           </div>
 
-          {/* Hover: LOVE label */}
-          <div className="absolute top-10 right-8 rotate-12 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none bg-green-500 text-white shadow-xl shadow-green-500/30 font-black text-2xl px-6 py-2 rounded-xl uppercase tracking-widest scale-75 group-hover:scale-100 z-20">
-            Love
-          </div>
-          {/* Hover: HATE label */}
-          <div className="absolute top-10 left-8 -rotate-12 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none bg-red-500 text-white shadow-xl shadow-red-500/30 font-black text-2xl px-6 py-2 rounded-xl uppercase tracking-widest scale-75 group-hover:scale-100 z-20">
-            Hate
-          </div>
         </div>
 
         {/* Action buttons */}
