@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function Header() {
@@ -8,18 +9,7 @@ function Header() {
           <div className="text-[#F59E0B] bg-[#F59E0B]/10 p-1.5 rounded-full">
             <span className="material-symbols-outlined text-2xl">radar</span>
           </div>
-          <span className="text-xl font-bold tracking-tight text-slate-800 hidden sm:block">QuirkRadar</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8">
-          <a className="text-sm font-semibold text-slate-500 hover:text-[#0EA5E9] transition-colors" href="#">How it Works</a>
-          <a className="text-sm font-semibold text-slate-500 hover:text-[#0EA5E9] transition-colors" href="#">Global Map</a>
-          <a className="text-sm font-semibold text-slate-500 hover:text-[#0EA5E9] transition-colors" href="#">About Us</a>
-        </div>
-        <div className="flex items-center gap-3">
-          <a className="text-sm font-bold text-slate-600 hover:text-[#0EA5E9] transition-colors px-3 py-2" href="#">Login</a>
-          <button className="bg-[#F59E0B] hover:bg-[#F59E0B]/90 text-white text-sm font-bold px-5 py-2.5 rounded-full transition-all shadow-[0_4px_14px_0_rgba(245,158,11,0.39)] hover:shadow-[0_6px_20px_rgba(245,158,11,0.23)] hover:-translate-y-0.5">
-            Join Now
-          </button>
+          <span className="text-xl font-bold tracking-tight text-slate-800 hidden sm:block">ThisOrThat</span>
         </div>
       </nav>
     </header>
@@ -27,6 +17,46 @@ function Header() {
 }
 
 function HeroSection({ onStart }) {
+  const [visitorCount, setVisitorCount] = useState(null)
+
+  useEffect(() => {
+    let sessionId = sessionStorage.getItem('tot_session')
+    if (!sessionId) {
+      sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36)
+      sessionStorage.setItem('tot_session', sessionId)
+    }
+
+    const heartbeat = async () => {
+      try {
+        const res = await fetch('/api/presence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        })
+        const data = await res.json()
+        setVisitorCount(data.count)
+      } catch {
+        // API 미사용 환경(vite dev)에서는 카운터 숨김
+      }
+    }
+
+    heartbeat()
+    const interval = setInterval(heartbeat, 45000)
+
+    const onLeave = () => {
+      navigator.sendBeacon(
+        '/api/presence',
+        JSON.stringify({ sessionId, leaving: true })
+      )
+    }
+    window.addEventListener('beforeunload', onLeave)
+
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('beforeunload', onLeave)
+    }
+  }, [])
+
   return (
     <main className="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-12 md:py-20 text-center max-w-7xl mx-auto w-full">
       <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-[#0EA5E9] mb-8 shadow-sm">
@@ -34,7 +64,11 @@ function HeroSection({ onStart }) {
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0EA5E9] opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0EA5E9]"></span>
         </span>
-        <span className="text-xs font-bold tracking-wide uppercase">2,492 people testing right now</span>
+        <span className="text-xs font-bold tracking-wide uppercase">
+          {visitorCount !== null
+            ? `${visitorCount.toLocaleString()} people testing right now`
+            : 'Live'}
+        </span>
       </div>
 
       <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1] mb-6 text-slate-900 drop-shadow-sm max-w-4xl mx-auto">
@@ -93,7 +127,7 @@ function Footer() {
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-slate-400">radar</span>
-          <span className="text-slate-700 font-bold text-lg">QuirkRadar</span>
+          <span className="text-slate-700 font-bold text-lg">ThisOrThat</span>
         </div>
         <div className="flex flex-wrap justify-center gap-8">
           <a className="text-slate-500 hover:text-[#0EA5E9] transition-colors text-sm font-medium" href="#">Privacy Policy</a>
@@ -101,7 +135,7 @@ function Footer() {
           <a className="text-slate-500 hover:text-[#0EA5E9] transition-colors text-sm font-medium" href="#">Contact Us</a>
         </div>
         <div className="text-slate-400 text-sm font-medium">
-          © 2024 QuirkRadar. Stay weird.
+          © 2024 ThisOrThat. Stay weird.
         </div>
       </div>
     </footer>
