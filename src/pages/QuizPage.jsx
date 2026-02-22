@@ -9,6 +9,108 @@ const AVATAR_URLS = [
 
 const USER_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1uLzjl71SLBQuY4fnrCgWWDA-Hm9UXA9n7w4ZDvCya_MrL5Ale5JOeRzPkSJIfj5s9aoJjgTY4ZDcy7PXeGjcFKRtdSuiA6YfE1klIONZ1qA7XzTlNKs_bJPq5f5OgvE4WVp7UWngnq6hfpN9O7IRi1spixMKw7qKcjHpCHuADTUn_ACGxEdo8oEIG9erJB9GAHJ-ICRpU8dlHwBiNpfgVzQcU948peQEny35WcKjuKmNVDPchWCBpd3FHQjvGYvx0Pzo5Ecxy6iL'
 
+// S = Structural Integrity (Q1,Q3,Q8,Q9) | E = Efficiency (Q5,Q6,Q10) | N = Normative (Q2,Q4,Q7)
+const ARCHETYPES = [
+  {
+    s: true, e: true, n: true,
+    rarity: 'Top 3%',
+    subtitleKo: '갓생 살다 기계가 되어버린',
+    nameKo: 'AI형 통제광',
+    descKo: '치약은 무조건 끝에서부터, 알람은 단 하나로 기상하는 당신은 인간미가 살짝 결여된 완벽주의자입니다. 냉장고 속 케첩 위치까지 정해져 있을 것 같은 당신의 아우라는 주변 사람들을 킹받게 하지만, 사실 당신 없으면 세상은 엉망이 될 거예요. 양말까지 신고 자는 그 철저한 자기관리, 솔직히 폼 미쳤습니다.',
+    country: '독일', flag: '🇩🇪', color: '#0EA5E9',
+  },
+  {
+    s: false, e: false, n: false,
+    rarity: 'Top 5%',
+    subtitleKo: '근본 없는 혼돈의 파괴자',
+    nameKo: '풀네임 델루루',
+    descKo: '케첩은 찬장에 방치하고 치약은 중간부터 푹 짜버리는 당신의 손길에는 일말의 망설임도 없습니다. 파인애플 피자를 당당히 시키고 알람을 7개나 맞추는 당신은 이 시대의 진정한 쿨가이이자 혼돈의 빌런입니다. 뒤처리를 서서 하는 그 독특한 폼, 진짜 광기가 느껴져서 오히려 리스펙하게 되네요.',
+    country: '미국 플로리다', flag: '🇺🇸', color: '#FF6B00',
+  },
+  {
+    s: true, e: true, n: false,
+    rarity: 'Top 8%',
+    subtitleKo: '효율에 미친',
+    nameKo: '스마트한 변태',
+    descKo: '밤에 샤워하고 양말까지 신어서 체온을 조절하는 당신의 모습은 흡사 정밀 기계와 같습니다. 모든 행동이 내일의 컨디션을 위해 계산된 것이며, TV 볼륨조차 짝수로 맞추는 그 섬세함은 경이롭기까지 합니다. 당신은 누구보다 빠르게 혼돈을 즐길 준비가 되어 있군요.',
+    country: '대한민국', flag: '🇰🇷', color: '#10B981',
+  },
+  {
+    s: true, e: false, n: false,
+    rarity: 'Top 12%',
+    subtitleKo: '자막 없으면 대화 불가능한',
+    nameKo: '디테일 집착러',
+    descKo: '한국어 영화도 자막 없이는 안 보는 당신은 소리보다 텍스트를 더 믿는 정보 과잉 시대의 산물입니다. 겉으로는 멀쩡해 보이지만 속으로는 "저 사람 왜 치약을 중간부터 짜지?"라며 100가지 유죄 목록을 작성하고 있는 당신, 정말 킹받는 매력이 있네요.',
+    country: '핀란드', flag: '🇫🇮', color: '#8B5CF6',
+  },
+  {
+    s: false, e: true, n: false,
+    rarity: 'Top 7%',
+    subtitleKo: '관습을 찢어버린',
+    nameKo: '파격적 시그마',
+    descKo: '뒤처리를 서서 한다는 사실 하나만으로도 당신은 이미 상위 1%의 유니크함을 가졌습니다. 남들이 뭐라 하든 파인애플 피자를 먹고 케첩을 찬장에 방치하는 당신은 진정한 시그마 그 자체입니다. 아침 샤워에 알람 한 번 기상까지, 혼돈을 질서 있게 즐기는 유일무이한 존재입니다.',
+    country: '브라질', flag: '🇧🇷', color: '#EF4444',
+  },
+  {
+    s: true, e: false, n: true,
+    rarity: 'Top 10%',
+    subtitleKo: '근본에 죽고 근본에 사는',
+    nameKo: '선비형 꼰대',
+    descKo: '모든 물건은 제자리에, 모든 음식은 정석대로 먹어야 행복한 당신은 이 시대의 마지막 유교보이/걸입니다. 밤에 샤워하며 경건하게 하루를 마무리하지만 아침엔 알람을 5번이나 미루는 인간적인 모습이 킬포입니다. 누군가 케첩을 찬장에 넣는 걸 보는 순간, 당신의 눈에 지진이 일어나겠죠.',
+    country: '이탈리아', flag: '🇮🇹', color: '#059669',
+  },
+  {
+    s: false, e: false, n: true,
+    rarity: 'Top 15%',
+    subtitleKo: '쾌락과 귀차니즘 사이를 유영하는',
+    nameKo: '갓생 호소인',
+    descKo: '남들 하는 건 다 하고 싶지만 막상 하려니 너무 귀찮은 당신! 피자에 파인애플은 절대 안 되지만 치약은 중간부터 짜버리는 그 모순적인 매력이 포인트입니다. 밤 샤워의 여유를 즐기고 양말 따위는 벗어 던진 채 자유를 만끽하는 당신의 아우라는 베이지 플래그의 집합체입니다.',
+    country: '스페인', flag: '🇪🇸', color: '#F59E0B',
+  },
+  {
+    s: false, e: true, n: true,
+    rarity: 'Top 9%',
+    subtitleKo: '군더더기 제로',
+    nameKo: '직선적 미니멀리스트',
+    descKo: '자막도 필요 없고, 양말도 답답하고, 피자에 과일이 올라가는 것도 용납 못 하는 당신은 아주 명확한 취향의 소유자입니다. 아침 샤워로 정신을 가다듬고 정해진 루틴대로 움직이지만, 가끔은 너무 무심하게 치약을 중간부터 짜버리는 반전 매력이 있습니다.',
+    country: '일본', flag: '🇯🇵', color: '#64748B',
+  },
+]
+
+function RadarChart({ scores, color }) {
+  const cx = 100, cy = 100, R = 68, n = 5
+  const axes = ['CHAOS', 'CHARM', 'WIT', 'CHILL', 'WEIRD']
+  const vals = [scores.chaos, scores.charm, scores.wit, scores.chill, scores.weird]
+  const ang = (i) => -Math.PI / 2 + (2 * Math.PI / n) * i
+  const pt = (i, r) => ({ x: cx + r * Math.cos(ang(i)), y: cy + r * Math.sin(ang(i)) })
+  const poly = (pts) => pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+  const rings = [0.25, 0.5, 0.75, 1].map(s => Array.from({ length: n }, (_, i) => pt(i, R * s)))
+  const outerPts = Array.from({ length: n }, (_, i) => pt(i, R))
+  const dataPts = Array.from({ length: n }, (_, i) => pt(i, R * Math.max(vals[i], 0.06)))
+  const labelPts = Array.from({ length: n }, (_, i) => pt(i, R + 15))
+  return (
+    <svg viewBox="0 0 200 200" className="w-full h-full">
+      {rings.map((ring, ri) => (
+        <polygon key={ri} points={poly(ring)} fill={ri === 3 ? '#F8FAFC' : 'none'} stroke="#E2E8F0" strokeWidth="1" />
+      ))}
+      {outerPts.map((p, i) => (
+        <line key={i} x1={cx} y1={cy} x2={p.x.toFixed(1)} y2={p.y.toFixed(1)} stroke="#E2E8F0" strokeWidth="1" />
+      ))}
+      <polygon points={poly(dataPts)} fill={`${color}22`} stroke={color} strokeWidth="2.5" strokeLinejoin="round" />
+      {dataPts.map((p, i) => (
+        <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="4" fill={color} stroke="white" strokeWidth="2" />
+      ))}
+      {labelPts.map((p, i) => (
+        <text key={i} x={p.x.toFixed(1)} y={p.y.toFixed(1)} textAnchor="middle" dominantBaseline="middle"
+          fontSize="7.5" fontWeight="800" fill={vals[i] > 0.6 ? color : '#94a3b8'}
+          fontFamily="'Spline Sans', sans-serif" letterSpacing="0.04em">
+          {axes[i]}
+        </text>
+      ))}
+    </svg>
+  )
+}
+
 const questions = [
   {
     id: 1,
@@ -326,62 +428,132 @@ const questions = [
 ]
 
 function ResultsScreen({ answers, onRestart }) {
-  const loveCount = answers.filter(a => a === 'love').length
-  const hateCount = answers.filter(a => a === 'hate').length
-  const skipCount = answers.filter(a => a === 'skip').length
-  const weirdoScore = Math.round((loveCount * 12 + skipCount * 5) % 100)
+  // --- Scoring ---
+  // S: Structural Integrity (Q1,Q3,Q8,Q9) — love = structured choice
+  const S = [answers[0]==='love', answers[2]==='love', answers[7]==='love', answers[8]==='love'].filter(Boolean).length
+  // E: Efficiency Pragmatism (Q5,Q6,Q10) — love = efficient choice
+  const E = [answers[4]==='love', answers[5]==='love', answers[9]==='love'].filter(Boolean).length
+  // N: Normative Adherence (Q2 love=sit, Q4 hate=no-pineapple, Q7 hate=subtitles-off)
+  const N = [answers[1]==='love', answers[3]==='hate', answers[6]==='hate'].filter(Boolean).length
+
+  const sHigh = S >= 2
+  const eHigh = E >= 2
+  const nHigh = N >= 2
+
+  const archetype = ARCHETYPES.find(a => a.s === sHigh && a.e === eHigh && a.n === nHigh) ?? ARCHETYPES[0]
+
+  const radar = {
+    chaos: (4 - S) / 4,
+    charm: N / 3,
+    wit: (S / 4 + E / 3) / 2,
+    chill: (3 - E) / 3,
+    weird: (3 - N) / 3,
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-white relative overflow-hidden" style={{ fontFamily: '"Spline Sans", sans-serif' }}>
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#0ea5e9]/10 blur-[100px] opacity-60" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#facc15]/20 blur-[100px] opacity-60" />
-        <div style={{ backgroundImage: 'radial-gradient(#e2e8f0 1px, transparent 1px)', backgroundSize: '24px 24px' }} className="absolute inset-0" />
-      </div>
+    <div
+      style={{ fontFamily: '"Spline Sans", sans-serif', backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', backgroundSize: '24px 24px' }}
+      className="bg-[#FAFAFA] text-slate-800 min-h-screen flex flex-col overflow-x-hidden"
+    >
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 py-4 md:px-10 sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <span className="material-symbols-outlined text-3xl text-[#FF6B00]">radar</span>
+          <h2 className="text-xl font-bold tracking-tight text-slate-900">QuirkRadar</h2>
+        </div>
+        <button
+          onClick={onRestart}
+          className="flex items-center gap-2 rounded-full h-10 px-5 bg-slate-100 hover:bg-slate-200 transition-colors text-slate-700 text-sm font-bold"
+        >
+          <span className="material-symbols-outlined text-[20px]">refresh</span>
+          <span className="hidden sm:inline">Retake Quiz</span>
+        </button>
+      </header>
 
-      <div className="relative z-10 flex flex-col items-center text-center max-w-md w-full">
-        <div className="text-7xl mb-4 animate-bounce">🎉</div>
-        <h2 className="text-4xl font-black text-slate-900 mb-2">Quiz Complete!</h2>
-        <p className="text-slate-500 text-lg mb-6">Your quirk profile has been analyzed</p>
-
-        <div className="w-full bg-gradient-to-br from-[#0ea5e9] to-indigo-600 rounded-3xl p-8 mb-6 text-white shadow-2xl shadow-[#0ea5e9]/30">
-          <div className="text-sm font-bold uppercase tracking-widest opacity-80 mb-1">Your Weirdo Score</div>
-          <div className="text-8xl font-black mb-1">{weirdoScore}</div>
-          <div className="text-sm opacity-70">out of 100</div>
+      {/* Main */}
+      <main className="flex-1 relative flex flex-col items-center justify-center py-12 px-4">
+        {/* Background glows */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[10%] left-[15%] w-[500px] h-[500px] bg-sky-200/40 rounded-full blur-[100px]" />
+          <div className="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] bg-orange-200/40 rounded-full blur-[100px]" />
         </div>
 
-        <div className="w-full bg-white rounded-2xl p-6 border border-slate-100 shadow-sm mb-8 flex justify-around">
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-3xl font-black text-green-500">{loveCount}</span>
-            <span className="text-xs text-slate-500 font-bold uppercase tracking-wide">Loved</span>
-          </div>
-          <div className="w-px bg-slate-100" />
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-3xl font-black text-red-500">{hateCount}</span>
-            <span className="text-xs text-slate-500 font-bold uppercase tracking-wide">Hated</span>
-          </div>
-          <div className="w-px bg-slate-100" />
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-3xl font-black text-slate-400">{skipCount}</span>
-            <span className="text-xs text-slate-500 font-bold uppercase tracking-wide">Skipped</span>
-          </div>
-        </div>
+        <div className="relative w-full max-w-[420px] flex flex-col gap-5 z-10">
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full">
-          <button
-            onClick={onRestart}
-            className="flex-1 bg-[#0ea5e9] hover:bg-[#0ea5e9]/90 text-white font-bold px-8 py-4 rounded-full transition-all shadow-lg hover:-translate-y-0.5"
-          >
-            Back to Home
-          </button>
-          <button
-            onClick={onRestart}
-            className="flex-1 bg-white hover:bg-slate-50 text-slate-700 font-bold px-8 py-4 rounded-full transition-all border border-slate-200 hover:-translate-y-0.5"
-          >
-            Share Result
-          </button>
+          {/* Main result card */}
+          <div className="bg-white rounded-[2.5rem] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden">
+
+            {/* Badge + Title */}
+            <div className="text-center mb-6">
+              <span
+                className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3"
+                style={{ backgroundColor: `${archetype.color}18`, color: archetype.color }}
+              >
+                Rare Personality Type
+              </span>
+              <div className="text-slate-400 font-extrabold text-2xl">{archetype.rarity}</div>
+              <h1
+                className="text-5xl font-black leading-none mt-2 mb-3"
+                style={{ backgroundImage: `linear-gradient(135deg, ${archetype.color}, ${archetype.color}99)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+              >
+                {archetype.nameKo}
+              </h1>
+              <p className="text-slate-400 text-sm font-semibold">{archetype.subtitleKo}</p>
+            </div>
+
+            {/* Radar chart */}
+            <div className="relative w-full aspect-square max-h-[280px] mx-auto mb-5">
+              <RadarChart scores={radar} color={archetype.color} />
+            </div>
+
+            {/* Soulmate country */}
+            <div className="bg-slate-50 rounded-2xl p-4 flex items-center gap-4 border border-slate-100">
+              <div className="size-12 shrink-0 rounded-full flex items-center justify-center text-3xl bg-white shadow-sm border border-slate-200">
+                {archetype.flag}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Soulmate Location</span>
+                <span className="text-slate-800 font-bold text-lg leading-tight">{archetype.country} {archetype.flag}</span>
+              </div>
+              <div className="ml-auto bg-white p-2 rounded-full shadow-sm">
+                <span className="material-symbols-outlined text-xl" style={{ color: archetype.color }}>favorite</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Description card */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+            <p className="text-slate-600 text-sm leading-relaxed font-medium">{archetype.descKo}</p>
+          </div>
+
+          {/* Share buttons */}
+          <div className="flex flex-col gap-3">
+            <button
+              className="w-full h-16 text-white rounded-2xl font-black text-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-3"
+              style={{ backgroundImage: `linear-gradient(135deg, ${archetype.color}, ${archetype.color}bb)` }}
+            >
+              <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+              </svg>
+              Share on Instagram
+            </button>
+            <div className="flex gap-3">
+              <button className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <span className="material-symbols-outlined text-[18px]">download</span>
+                Save Image
+              </button>
+              <button className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <span className="material-symbols-outlined text-[18px]">link</span>
+                Copy Link
+              </button>
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-slate-400 font-medium pb-4">
+            Join 2M+ others discovering their quirk score.
+          </p>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
