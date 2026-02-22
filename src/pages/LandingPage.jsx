@@ -1,20 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-function Header() {
-  return (
-    <header className="relative z-10 w-full px-6 py-6 flex justify-center">
-      <nav className="flex items-center justify-between w-full max-w-5xl bg-white/80 backdrop-blur-md border border-slate-200 rounded-full px-6 py-3 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center gap-2">
-          <div className="text-[#F59E0B] bg-[#F59E0B]/10 p-1.5 rounded-full">
-            <span className="material-symbols-outlined text-2xl">radar</span>
-          </div>
-          <span className="text-xl font-bold tracking-tight text-slate-800 hidden sm:block">ThisOrThat</span>
-        </div>
-      </nav>
-    </header>
-  )
-}
 
 function HeroSection({ onStart }) {
   const [visitorCount, setVisitorCount] = useState(null)
@@ -153,7 +139,6 @@ export default function LandingPage() {
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[#FDE047]/20 rounded-full blur-[100px] opacity-50"></div>
         <div className="absolute top-20 left-20 w-[300px] h-[300px] bg-[#F59E0B]/10 rounded-full blur-[80px] opacity-40"></div>
       </div>
-      <Header />
       <HeroSection onStart={() => navigate('/quiz')} />
       <Footer />
     </div>

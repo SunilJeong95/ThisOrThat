@@ -492,10 +492,6 @@ function ResultsScreen({ answers, onRestart }) {
     >
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 md:px-10 sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-3xl text-[#FF6B00]">radar</span>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900">ThisOrThat</h2>
-        </div>
         <button
           onClick={onRestart}
           className="flex items-center gap-2 rounded-full h-10 px-5 bg-slate-100 hover:bg-slate-200 transition-colors text-slate-700 text-sm font-bold"
@@ -705,15 +701,7 @@ export default function QuizPage() {
 
       {/* Header */}
       <header className="relative z-50 flex items-center justify-between px-6 py-4 md:px-10 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center size-10 rounded-full bg-[#0ea5e9] text-white shadow-lg shadow-[#0ea5e9]/20 hover:scale-105 transition-transform"
-          >
-            <span className="material-symbols-outlined text-[24px]">radar</span>
-          </button>
-          <h1 className="text-xl font-bold tracking-tight text-slate-800 hidden sm:block">ThisOrThat</h1>
-        </div>
+        <div></div>
         <div className="flex items-center gap-4">
           <button className="flex items-center justify-center size-10 rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-800">
             <span className="material-symbols-outlined">share</span>
