@@ -460,11 +460,12 @@ export default function QuizPage() {
   const navigate = useNavigate()
   const [currentIdx, setCurrentIdx] = useState(0)
   const [answers, setAnswers] = useState([])
-  const [exitDir, setExitDir] = useState(null) // null | 'left' | 'right' | 'up'
+  const [exitDir, setExitDir] = useState(null) // null | 'left' | 'right'
   const [isDone, setIsDone] = useState(false)
   const [hoveredSide, setHoveredSide] = useState(null) // 'left' | 'right' | null
+  const [voteCounts, setVoteCounts] = useState({}) // { q1: { left, right }, ... }
 
-  // Preload all quiz images on mount so transitions are instant
+  // Preload all quiz images + fetch vote counts on mount
   useEffect(() => {
     questions.forEach(q => {
       const l = new Image()
@@ -472,6 +473,10 @@ export default function QuizPage() {
       l.src = q.leftImg
       r.src = q.rightImg
     })
+    fetch('/api/vote')
+      .then(r => r.json())
+      .then(data => setVoteCounts(data))
+      .catch(() => {})
   }, [])
 
   const question = questions[currentIdx]
@@ -481,7 +486,26 @@ export default function QuizPage() {
   const handleAnswer = useCallback((answer) => {
     if (exitDir !== null || isDone) return
 
-    const dir = answer === 'love' ? 'right' : answer === 'hate' ? 'left' : 'up'
+    const side = answer === 'love' ? 'left' : 'right'
+    const qKey = `q${questions[currentIdx].id}`
+
+    // Optimistically update local vote count
+    setVoteCounts(prev => {
+      const cur = prev[qKey] || { left: 0, right: 0 }
+      return { ...prev, [qKey]: { ...cur, [side]: (cur[side] || 0) + 1 } }
+    })
+
+    // Persist to KV
+    fetch('/api/vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ questionId: questions[currentIdx].id, side }),
+    })
+      .then(r => r.json())
+      .then(updated => setVoteCounts(prev => ({ ...prev, [qKey]: updated })))
+      .catch(() => {})
+
+    const dir = answer === 'love' ? 'right' : 'left'
     setExitDir(dir)
     setHoveredSide(null)
 
@@ -495,13 +519,12 @@ export default function QuizPage() {
       }
       setExitDir(null)
     }, 380)
-  }, [exitDir, isDone, answers])
+  }, [exitDir, isDone, answers, currentIdx])
 
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'ArrowRight') handleAnswer('love')
       else if (e.key === 'ArrowLeft') handleAnswer('hate')
-      else if (e.key === 'ArrowUp') handleAnswer('skip')
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -510,7 +533,6 @@ export default function QuizPage() {
   const cardTransform =
     exitDir === 'right' ? 'translateX(130%) rotate(18deg)' :
     exitDir === 'left'  ? 'translateX(-130%) rotate(-18deg)' :
-    exitDir === 'up'    ? 'translateY(-120%) scale(0.85)' :
     'translateX(0) rotate(0deg)'
 
   if (isDone) {
@@ -570,17 +592,6 @@ export default function QuizPage() {
               <h2 className="text-xl md:text-2xl font-bold text-slate-900 leading-tight">{question.title}</h2>
               <p className="text-slate-400 text-sm font-medium leading-snug">{question.description}</p>
             </div>
-            {/* Skip button */}
-            <button
-              onClick={() => handleAnswer('skip')}
-              className="shrink-0 mt-0.5 flex flex-col items-center gap-1 group"
-              title="Skip"
-            >
-              <div className="size-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 group-hover:bg-amber-100 group-hover:text-amber-600 transition-colors">
-                <span className="material-symbols-outlined text-xl">keyboard_arrow_up</span>
-              </div>
-              <span className="text-[9px] uppercase font-bold text-slate-300 group-hover:text-amber-500 transition-colors">Skip</span>
-            </button>
           </div>
 
           {/* Two-image choice area */}
@@ -675,23 +686,31 @@ export default function QuizPage() {
           </div>
 
           {/* Footer: vote count */}
-          <div className="px-5 pb-4 flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {AVATAR_URLS.map((url, i) => (
-                <div
-                  key={i}
-                  className="size-6 rounded-full ring-2 ring-white bg-slate-200 bg-cover shadow-sm"
-                  style={{ backgroundImage: `url('${url}')` }}
-                />
-              ))}
-            </div>
-            <span className="text-xs text-slate-400 font-semibold">{question.votes} voted recently</span>
-          </div>
+          {(() => {
+            const qc = voteCounts[`q${question.id}`]
+            const total = qc ? (qc.left + qc.right) : null
+            return (
+              <div className="px-5 pb-4 flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {AVATAR_URLS.map((url, i) => (
+                    <div
+                      key={i}
+                      className="size-6 rounded-full ring-2 ring-white bg-slate-200 bg-cover shadow-sm"
+                      style={{ backgroundImage: `url('${url}')` }}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-slate-400 font-semibold">
+                  {total !== null ? `${total.toLocaleString()} voted` : 'Be the first to vote!'}
+                </span>
+              </div>
+            )
+          })()}
         </div>
 
         {/* Tap hint for mobile */}
         <p className="mt-4 text-xs text-slate-400 font-medium text-center md:hidden">
-          Tap a photo to choose
+          Tap a photo to pick your side
         </p>
       </main>
     </div>
