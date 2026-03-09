@@ -53,7 +53,7 @@ function HeroSection({ onStart }) {
         {visitorCount !== null ? (
           <span className="text-sm font-bold tracking-wide">
             <span className="text-2xl font-black text-[#0EA5E9]">{visitorCount.toLocaleString()}</span>
-            {' '}명이 지금 테스트 중
+            {' '}people taking the test right now
           </span>
         ) : (
           <span className="text-xs font-bold tracking-wide uppercase">Live</span>
