@@ -29,9 +29,9 @@ export default function AboutPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-3">How It Works</h2>
             <p>
-              We ask you 10 quick questions — things like how you squeeze toothpaste, whether you eat pineapple on pizza, and if you wear socks to bed.
-              Your answers are scored across three dimensions: <strong>Structural Integrity</strong>, <strong>Efficiency</strong>, and <strong>Normative Behaviour</strong>.
-              The combination maps you to one of 8 unique personality archetypes, complete with a radar chart and a soulmate country.
+              We ask you 10 quick questions about everyday habits — things like how you squeeze toothpaste, whether you eat pineapple on pizza, and if you wear socks to bed.
+              Your answers are scored on two axes: <strong>Chrono-Routine</strong> (your shower and alarm habits define one of 4 base types) and <strong>Micro-Chaos Quotient</strong> (your remaining 8 choices each add a chaos point, placing you in one of 6 tiers).
+              The combination maps you to one of <strong>24 unique personality archetypes</strong>, complete with a radar chart and a soulmate country.
             </p>
           </section>
 
@@ -47,17 +47,34 @@ export default function AboutPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-slate-800 mb-3">The 8 Archetypes</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-3">The 24 Archetypes</h2>
+            <p className="text-slate-500 text-sm mb-3">Your result is determined by two axes: your <strong>Chrono-Routine</strong> (shower + alarm habits) and your <strong>Micro-Chaos Quotient</strong> — a score from 0 to 8 based on your remaining choices.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
               {[
-                { name: 'The AI Control Freak', rarity: 'Top 3%' },
-                { name: 'Full Send Delulu', rarity: 'Top 5%' },
-                { name: 'The Smart Weirdo', rarity: 'Top 8%' },
-                { name: 'The Detail Obsessive', rarity: 'Top 12%' },
-                { name: 'The Radical Sigma', rarity: 'Top 7%' },
-                { name: 'The Principled Traditionalist', rarity: 'Top 10%' },
-                { name: 'The Aspiring Go-Getter', rarity: 'Top 15%' },
-                { name: 'The Straight-Cut Minimalist', rarity: 'Top 9%' },
+                { name: 'The Flawless Vanguard',       rarity: 'Top 1%'    },
+                { name: 'The Quirky Overachiever',     rarity: 'Top 8%'    },
+                { name: 'The Balanced Paradox',        rarity: 'Top 11%'   },
+                { name: 'The Strategic Eccentric',     rarity: 'Top 9%'    },
+                { name: 'The Early-Bird Menace',       rarity: 'Top 3%'    },
+                { name: 'The Unstoppable Anomaly',     rarity: 'Top 0.05%' },
+                { name: 'The Procrastinating Perfectionist', rarity: 'Top 8%' },
+                { name: 'The Forgivable Mess',         rarity: 'Top 15%'   },
+                { name: 'The Harmonious Disaster',     rarity: 'Top 12%'   },
+                { name: 'The Defiant Scrambler',       rarity: 'Top 8%'    },
+                { name: 'The Brazen Chaotic',          rarity: 'Top 3%'    },
+                { name: 'The Absurdist Survivor',      rarity: 'Top 0.08%' },
+                { name: 'The Calculated Night Owl',    rarity: 'Top 4%'    },
+                { name: 'The Aesthetic Nocturnal',     rarity: 'Top 10%'   },
+                { name: 'The Functioning Paradox',     rarity: 'Top 10%'   },
+                { name: 'The Methodical Madman',       rarity: 'Top 6%'    },
+                { name: 'The Dark Menace',             rarity: 'Top 2%'    },
+                { name: 'The Unhinged Vampire',        rarity: 'Top 0.03%' },
+                { name: 'The Harmless Sloth',          rarity: 'Top 9%'    },
+                { name: 'The Chronically Exhausted',   rarity: 'Top 15%'   },
+                { name: 'The Cozy Mess',               rarity: 'Top 11%'   },
+                { name: 'The Obstinate Slacker',       rarity: 'Top 7%'    },
+                { name: 'The Walking Hazard',          rarity: 'Top 2%'    },
+                { name: 'The Rootless Destroyer',      rarity: 'Top 0.05%' },
               ].map(a => (
                 <div key={a.name} className="bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
                   <div className="font-bold text-slate-800 text-sm">{a.name}</div>
