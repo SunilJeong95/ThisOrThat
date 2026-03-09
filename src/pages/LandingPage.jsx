@@ -45,16 +45,19 @@ function HeroSection({ onStart }) {
 
   return (
     <main className="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-12 md:py-20 text-center max-w-7xl mx-auto w-full">
-      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-[#0EA5E9] mb-8 shadow-sm">
-        <span className="relative flex h-3 w-3">
+      <div className="inline-flex items-center gap-3 px-5 py-3 rounded-full bg-blue-50 border border-blue-100 text-[#0EA5E9] mb-8 shadow-sm">
+        <span className="relative flex h-3 w-3 shrink-0">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0EA5E9] opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0EA5E9]"></span>
         </span>
-        <span className="text-xs font-bold tracking-wide uppercase">
-          {visitorCount !== null
-            ? `${visitorCount.toLocaleString()} people testing right now`
-            : 'Live'}
-        </span>
+        {visitorCount !== null ? (
+          <span className="text-sm font-bold tracking-wide">
+            <span className="text-2xl font-black text-[#0EA5E9]">{visitorCount.toLocaleString()}</span>
+            {' '}명이 지금 테스트 중
+          </span>
+        ) : (
+          <span className="text-xs font-bold tracking-wide uppercase">Live</span>
+        )}
       </div>
 
       <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1] mb-6 text-slate-900 drop-shadow-sm max-w-4xl mx-auto">
