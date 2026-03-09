@@ -466,6 +466,16 @@ export default function QuizPage() {
   const [isDone, setIsDone] = useState(false)
   const [hoveredSide, setHoveredSide] = useState(null) // 'left' | 'right' | null
 
+  // Preload all quiz images on mount so transitions are instant
+  useEffect(() => {
+    questions.forEach(q => {
+      const l = new Image()
+      const r = new Image()
+      l.src = q.leftImg
+      r.src = q.rightImg
+    })
+  }, [])
+
   const question = questions[currentIdx]
   const nextQuestion = questions[currentIdx + 1]
   const progress = (answers.length / questions.length) * 100
@@ -590,6 +600,7 @@ export default function QuizPage() {
                 alt={question.leftLabel}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
                 style={{ transform: hoveredSide === 'left' ? 'scale(1.06)' : 'scale(1)' }}
+                fetchPriority="high"
                 draggable={false}
               />
               {/* Dark gradient at bottom */}
@@ -640,6 +651,7 @@ export default function QuizPage() {
                 alt={question.rightLabel}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
                 style={{ transform: hoveredSide === 'right' ? 'scale(1.06)' : 'scale(1)' }}
+                fetchPriority="high"
                 draggable={false}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
