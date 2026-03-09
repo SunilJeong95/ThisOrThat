@@ -604,19 +604,20 @@ function ResultsScreen({ answers, onRestart }) {
     if (urls[platform]) window.open(urls[platform], '_blank', 'noopener,noreferrer')
   }
 
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+
   // Synchronous — no await before navigator.share, preserves iOS/Android user gesture context
   const handleDownload = () => {
     if (!imgReady) return
     const file = shareFileRef.current
     const blobUrl = shareBlobUrlRef.current
 
-    // iOS Safari 15+ & Android Chrome/WebView: native share sheet → "Save Image"
-    // Most in-app browsers (KakaoTalk, Instagram) also support this via the platform WebView.
-    if (navigator.canShare?.({ files: [file] })) {
-      navigator.share({ files: [file], title: 'My ThisOrThat Result' }).catch(e => {
-        if (e.name !== 'AbortError') triggerDownload(blobUrl)
-      })
+    if (isMobile && navigator.canShare?.({ files: [file] })) {
+      // Mobile: native share sheet → "Save Image" → gallery
+      navigator.share({ files: [file], title: 'My ThisOrThat Result' })
+        .catch(e => { if (e.name !== 'AbortError') triggerDownload(blobUrl) })
     } else {
+      // PC: direct download
       triggerDownload(blobUrl)
     }
   }
