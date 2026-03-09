@@ -1,6 +1,187 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import html2canvas from 'html2canvas'
+
+// Twemoji CDN — consistent emoji rendering across all browsers/OS
+function FlagEmoji({ emoji, size = 32 }) {
+  const codepoints = [...emoji].map(c => c.codePointAt(0).toString(16)).join('-')
+  return (
+    <img
+      src={`https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/${codepoints}.svg`}
+      alt={emoji}
+      width={size}
+      height={size}
+      style={{ display: 'inline-block', verticalAlign: 'middle' }}
+      draggable={false}
+    />
+  )
+}
+
+// ── Canvas helpers for share image generation ─────────────────────────────────
+function drawRoundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+  ctx.closePath()
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ')
+  let line = ''
+  let curY = y
+  for (const word of words) {
+    const test = line + word + ' '
+    if (ctx.measureText(test).width > maxWidth && line) {
+      ctx.fillText(line.trim(), x, curY)
+      line = word + ' '
+      curY += lineHeight
+    } else {
+      line = test
+    }
+  }
+  ctx.fillText(line.trim(), x, curY)
+}
+
+function drawRadarCanvas(ctx, vals, color, cx, cy, R) {
+  const n = 5
+  const axes = ['CHAOS', 'CHARM', 'WIT', 'CHILL', 'WEIRD']
+  const ang = i => -Math.PI / 2 + (2 * Math.PI / n) * i
+  const pt = (i, r) => ({ x: cx + r * Math.cos(ang(i)), y: cy + r * Math.sin(ang(i)) })
+
+  ctx.strokeStyle = '#E2E8F0'
+  ctx.lineWidth = 1.5
+  for (const s of [0.25, 0.5, 0.75, 1]) {
+    ctx.beginPath()
+    for (let i = 0; i < n; i++) {
+      const p = pt(i, R * s)
+      i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)
+    }
+    ctx.closePath()
+    ctx.stroke()
+  }
+  for (let i = 0; i < n; i++) {
+    const p = pt(i, R)
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(p.x, p.y); ctx.stroke()
+  }
+
+  ctx.beginPath()
+  for (let i = 0; i < n; i++) {
+    const p = pt(i, R * Math.max(vals[i], 0.06))
+    i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)
+  }
+  ctx.closePath()
+  ctx.fillStyle = `${color}33`
+  ctx.fill()
+  ctx.strokeStyle = color
+  ctx.lineWidth = 3
+  ctx.stroke()
+
+  for (let i = 0; i < n; i++) {
+    const p = pt(i, R * Math.max(vals[i], 0.06))
+    ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI * 2)
+    ctx.fillStyle = color; ctx.fill()
+    ctx.strokeStyle = 'white'; ctx.lineWidth = 2.5; ctx.stroke()
+  }
+
+  ctx.font = 'bold 15px -apple-system, system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  for (let i = 0; i < n; i++) {
+    const p = pt(i, R + 26)
+    ctx.fillStyle = vals[i] > 0.6 ? color : '#94a3b8'
+    ctx.fillText(axes[i], p.x, p.y + 6)
+  }
+}
+
+async function generateShareImage(archetype, radar) {
+  const W = 800, H = 1200, PAD = 64
+  const canvas = document.createElement('canvas')
+  canvas.width = W
+  canvas.height = H
+  const ctx = canvas.getContext('2d')
+  const color = archetype.color
+
+  ctx.fillStyle = '#FAFAFA'
+  ctx.fillRect(0, 0, W, H)
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, W, 10)
+
+  let y = 60
+
+  // Badge
+  ctx.font = 'bold 14px -apple-system, system-ui, sans-serif'
+  const badgeText = 'RARE PERSONALITY TYPE'
+  const bw = ctx.measureText(badgeText).width + 44
+  drawRoundedRect(ctx, (W - bw) / 2, y, bw, 36, 18)
+  ctx.fillStyle = `${color}22`; ctx.fill()
+  ctx.fillStyle = color; ctx.textAlign = 'center'
+  ctx.fillText(badgeText, W / 2, y + 23)
+  y += 56
+
+  // Rarity
+  ctx.fillStyle = '#94a3b8'
+  ctx.font = 'bold 30px -apple-system, system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText(archetype.rarity, W / 2, y)
+  y += 56
+
+  // Archetype name
+  ctx.fillStyle = color
+  const fontSize = archetype.name.length > 18 ? 52 : archetype.name.length > 12 ? 62 : 72
+  ctx.font = `900 ${fontSize}px -apple-system, system-ui, sans-serif`
+  ctx.textAlign = 'center'
+  ctx.fillText(archetype.name, W / 2, y)
+  y += 44
+
+  // Subtitle
+  ctx.fillStyle = '#94a3b8'
+  ctx.font = '600 22px -apple-system, system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText(archetype.subtitle, W / 2, y)
+  y += 52
+
+  // Radar chart
+  const radarCY = y + 148
+  const vals = [radar.chaos, radar.charm, radar.wit, radar.chill, radar.weird]
+  drawRadarCanvas(ctx, vals, color, W / 2, radarCY, 130)
+  y = radarCY + 130 + 48
+
+  // Country box
+  drawRoundedRect(ctx, PAD, y, W - PAD * 2, 82, 20)
+  ctx.fillStyle = '#f1f5f9'; ctx.fill()
+  ctx.fillStyle = '#94a3b8'
+  ctx.font = 'bold 13px -apple-system, system-ui, sans-serif'
+  ctx.textAlign = 'left'
+  ctx.fillText('SOULMATE LOCATION', PAD + 24, y + 30)
+  ctx.fillStyle = '#1e293b'
+  ctx.font = 'bold 27px -apple-system, system-ui, sans-serif'
+  ctx.fillText(`${archetype.country} ${archetype.flag}`, PAD + 24, y + 64)
+  y += 110
+
+  // Divider
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke()
+  y += 36
+
+  // Description
+  ctx.fillStyle = '#64748b'
+  ctx.font = '500 19px -apple-system, system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  wrapCanvasText(ctx, archetype.desc, W / 2, y, W - PAD * 2, 30)
+
+  // Watermark
+  ctx.fillStyle = '#cbd5e1'
+  ctx.font = 'bold 18px -apple-system, system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('thisorthat.pages.dev', W / 2, H - 32)
+
+  return canvas
+}
 
 const AVATAR_URLS = [
   'https://lh3.googleusercontent.com/aida-public/AB6AXuACOffwaPSA48nJlMY5OPZeWi-S5pu-bxuKbjdUrcqSLWWGqQ6rkUwvVv8rHVqk84sYv3Uwxv5m0rFf7_BM3YKWsNrMEJA7FenBE65mRzqeVUtl__SBoveKlpJPCvti75vW_tiiDB4x6Wf4nYdqb4WfhNMrUTuntQ82GDN2JciyiKl18zbJ7W632cXje6a3jSpjyIv_ujJs9A3RjptKFDoiIKB1II10ClB-_52EjIYHF8CTJPSRQOPNY6kwKcQIBuBOpGF3pqdhFPFk',
@@ -250,7 +431,6 @@ function encodeAnswers(answers) {
 }
 
 function ResultsScreen({ answers, onRestart }) {
-  const resultCardRef = useRef(null)
   // S: Structural Integrity (Q1,Q3,Q8,Q9) — love = structured choice
   const S = [answers[0]==='love', answers[2]==='love', answers[7]==='love', answers[8]==='love'].filter(Boolean).length
   // E: Efficiency Pragmatism (Q5,Q6,Q10) — love = efficient choice
@@ -294,15 +474,17 @@ function ResultsScreen({ answers, onRestart }) {
   }
 
   const handleDownload = async () => {
-    if (!resultCardRef.current || saving) return
+    if (saving) return
     setSaving(true)
     try {
-      const canvas = await html2canvas(resultCardRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff' })
+      const canvas = await generateShareImage(archetype, radar)
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
       const file = new File([blob], 'thisorthat-result.png', { type: 'image/png' })
+      // iOS & Android: Web Share API with file → native share sheet → "Save Image" / "Save to Photos"
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: 'My ThisOrThat Result' })
       } else {
+        // Desktop fallback
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
@@ -311,7 +493,7 @@ function ResultsScreen({ answers, onRestart }) {
         URL.revokeObjectURL(url)
       }
     } catch {
-      // 취소 또는 오류 시 무시
+      // 사용자 취소 또는 오류 시 무시
     } finally {
       setSaving(false)
     }
@@ -359,7 +541,7 @@ function ResultsScreen({ answers, onRestart }) {
         <div className="relative w-full max-w-[420px] flex flex-col gap-5 z-10">
 
           {/* Main result card */}
-          <div ref={resultCardRef} className="bg-white rounded-[2.5rem] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden">
+          <div className="bg-white rounded-[2.5rem] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden">
 
             {/* Badge + Title */}
             <div className="text-center mb-6">
@@ -386,12 +568,12 @@ function ResultsScreen({ answers, onRestart }) {
 
             {/* Soulmate country */}
             <div className="bg-slate-50 rounded-2xl p-4 flex items-center gap-4 border border-slate-100">
-              <div className="size-12 shrink-0 rounded-full flex items-center justify-center text-3xl bg-white shadow-sm border border-slate-200">
-                {archetype.flag}
+              <div className="size-12 shrink-0 rounded-full flex items-center justify-center bg-white shadow-sm border border-slate-200">
+                <FlagEmoji emoji={archetype.flag} size={30} />
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Soulmate Location</span>
-                <span className="text-slate-800 font-bold text-lg leading-tight">{archetype.country} {archetype.flag}</span>
+                <span className="text-slate-800 font-bold text-lg leading-tight">{archetype.country} <FlagEmoji emoji={archetype.flag} size={18} /></span>
               </div>
               <div className="ml-auto bg-white p-2 rounded-full shadow-sm">
                 <span className="material-symbols-outlined text-xl" style={{ color: archetype.color }}>favorite</span>
@@ -618,9 +800,10 @@ export default function QuizPage() {
               {currentIdx > 0 && (
                 <button
                   onClick={handleBack}
-                  className="flex items-center justify-center size-7 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors text-slate-500"
+                  className="flex items-center gap-1 h-9 px-3 rounded-full bg-slate-100 active:bg-slate-200 transition-colors text-slate-500 text-xs font-bold"
                 >
-                  <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                  <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+                  <span>Back</span>
                 </button>
               )}
               <span className="text-sm font-bold text-[#0ea5e9] uppercase tracking-wider bg-[#0ea5e9]/10 px-3 py-0.5 rounded-full">
