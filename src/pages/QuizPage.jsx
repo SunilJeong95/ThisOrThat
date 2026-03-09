@@ -50,7 +50,7 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
 
 function drawRadarCanvas(ctx, vals, color, cx, cy, R) {
   const n = 5
-  const axes = ['CHAOS', 'CHARM', 'WIT', 'CHILL', 'WEIRD']
+  const axes = ['CHAOS', 'REBEL', 'WILD', 'CHILL', 'WEIRD']
   const ang = i => -Math.PI / 2 + (2 * Math.PI / n) * i
   const pt = (i, r) => ({ x: cx + r * Math.cos(ang(i)), y: cy + r * Math.sin(ang(i)) })
 
@@ -240,7 +240,7 @@ async function generateShareImage(archetype, radar) {
 
   // Radar chart
   const radarCY = y + RADAR_R + 14
-  drawRadarCanvas(ctx, [radar.chaos, radar.charm, radar.wit, radar.chill, radar.weird], C, W / 2, radarCY, RADAR_R)
+  drawRadarCanvas(ctx, [radar.chaos, radar.rebel, radar.wild, radar.chill, radar.weird], C, W / 2, radarCY, RADAR_R)
   y += RADAR_ZONE + 28
 
   // Country box
@@ -292,78 +292,191 @@ const AVATAR_URLS = [
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCb28WDK4Em_wua_veH-u1RtWOYNpAeDmBRMm1AumleNAsL5zdeLROFuscFyebk0BCrvag7XR7FcjvPGoGU5Y6zz_5uwIK6aEC26yrUTixOUlaDXz_Hjgfc9gct67yqSbJ4lyQ2oTAG_PILnzuVVdbsnas9OUJct5vI9XPFDpp2tOU0vAKF5mrVq-pMupdqenRFDY-_gtsaabHikvUVOk_iMldU3pNNilGbs9omjLjZtAEiyYAztrH06NkN16VIkoKBgsNa8DhQoPcz',
 ]
 
-// S = Structural Integrity (Q1,Q3,Q8,Q9) | E = Efficiency (Q5,Q6,Q10) | N = Normative (Q2,Q4,Q7)
+// 24 archetypes: index = (cr−1)*6 + mcqTier
+// CR1=Morning+OneAlarm  CR2=Morning+Snooze  CR3=Night+OneAlarm  CR4=Night+Snooze
+// MCQ tier: 0(0-1pts) 1(2-3pts) 2(4pts) 3(5pts) 4(6-7pts) 5(8pts)
 const ARCHETYPES = [
+  // ── CR1: Morning + One Alarm ─────────────────────────────────────
   {
-    s: true, e: true, n: true,
-    rarity: 'Top 3%',
-    subtitle: 'Turned into a machine chasing the perfect life',
-    name: 'The AI Control Freak',
-    desc: 'Toilet paper over, one alarm, everything in its place — you\'re a perfectionist with a slight deficiency in human warmth. Your fridge probably has an assigned spot for every condiment. People find your aura insufferable, but honestly, the world would fall apart without you. Wearing socks to bed? That level of self-discipline is genuinely impressive.',
+    rarity: 'Top 1%',
+    name: 'The Flawless Vanguard',
+    subtitle: 'An AI-grade model citizen no one fully trusts',
+    desc: 'One alarm, bolt upright, toilet paper over the roll, ketchup in the fridge — you are a perfectly optimised system running inside a human body. People find your aura mildly insufferable. Deep down they know the world would quietly collapse without you.',
     country: 'Germany', flag: '🇩🇪', color: '#0EA5E9',
   },
   {
-    s: false, e: false, n: false,
-    rarity: 'Top 5%',
-    subtitle: 'The rootless destroyer of chaos',
-    name: 'Full Send Delulu',
-    desc: 'You squeeze toothpaste from the middle without hesitation, store ketchup in the cupboard like a free spirit, and order pineapple pizza with zero shame. With multiple alarms set and a standing bathroom routine, you are the true chaos villain of our generation. The audacity is honestly iconic.',
-    country: 'Florida, USA', flag: '🇺🇸', color: '#FF6B00',
-  },
-  {
-    s: true, e: true, n: false,
     rarity: 'Top 8%',
-    subtitle: 'Clinically obsessed with efficiency',
-    name: 'The Smart Weirdo',
-    desc: 'Night showers and socks in bed for optimal body temperature — you operate like a precision machine, every action calculated for tomorrow\'s performance. Even your TV volume is a multiple of five. You\'re ready to enjoy chaos more efficiently than anyone else.',
-    country: 'South Korea', flag: '🇰🇷', color: '#10B981',
+    name: 'The Quirky Overachiever',
+    subtitle: 'Elite on the outside, faintly unhinged within',
+    desc: 'Morning shower, one alarm, everything seemingly together — then pineapple on pizza and subtitles always on because you trust text more than ears. You appear to have your life sorted. Your minor eccentricities make that fact somehow more unsettling.',
+    country: 'Canada', flag: '🇨🇦', color: '#2563EB',
   },
   {
-    s: true, e: false, n: false,
-    rarity: 'Top 12%',
-    subtitle: 'Cannot function without subtitles',
-    name: 'The Detail Obsessive',
-    desc: 'You watch movies with subtitles because you trust text more than sound — a true product of the information overload era. You look fine on the outside, but inside you\'re mentally filing 100 charges against anyone who squeezes toothpaste from the middle. Infuriating and weirdly charming.',
-    country: 'Finland', flag: '🇫🇮', color: '#8B5CF6',
+    rarity: 'Top 11%',
+    name: 'The Balanced Paradox',
+    subtitle: 'Half productivity god, half walking contradiction',
+    desc: 'One alarm and a morning shower signal a disciplined mind. Toothpaste squeezed from the middle and TV volume on a random number signal the other half of your brain. You are precisely 50% chaos, 50% structure, and 100% confusing to live with.',
+    country: 'South Korea', flag: '🇰🇷', color: '#4F46E5',
   },
   {
-    s: false, e: true, n: false,
-    rarity: 'Top 7%',
-    subtitle: 'Shredded every convention',
-    name: 'The Radical Sigma',
-    desc: 'Standing up alone puts you in the top 1% of uniqueness. Pineapple pizza, ketchup in the cupboard — you do it all without apology. Morning showers, one alarm, out the door: you\'re a one-of-a-kind existence who enjoys chaos with surprising structure.',
-    country: 'Brazil', flag: '🇧🇷', color: '#EF4444',
+    rarity: 'Top 9%',
+    name: 'The Strategic Eccentric',
+    subtitle: 'Deliberately and systematically wrong about small things',
+    desc: 'You wake up on time and spend the day making choices that silently torment everyone around you. Toilet paper backwards, ketchup in the cupboard, your own internal rulebook that makes perfect sense to exactly one person. A productivity god with a deeply niche personal philosophy.',
+    country: 'United Kingdom', flag: '🇬🇧', color: '#7C3AED',
   },
   {
-    s: true, e: false, n: true,
-    rarity: 'Top 10%',
-    subtitle: 'Living and dying by the rules',
-    name: 'The Principled Traditionalist',
-    desc: 'Everything in its place, every food eaten the correct way — you\'re the last rule-keeper standing in modern times. You end the day with a dignified night shower, yet somehow hit snooze five times every morning, which is honestly your most lovable flaw.',
-    country: 'Italy', flag: '🇮🇹', color: '#059669',
+    rarity: 'Top 3%',
+    name: 'The Early-Bird Menace',
+    subtitle: 'Productive before 9am, deeply alarming at all times',
+    desc: 'First alarm, out of bed, then socks on for sleep and toothpaste mauled from the centre — your efficiency is undeniable but your life choices are genuinely difficult to explain. You are the most functional disaster anyone has ever met.',
+    country: 'Russia', flag: '🇷🇺', color: '#DC2626',
   },
   {
-    s: false, e: false, n: true,
-    rarity: 'Top 15%',
-    subtitle: 'Drifting between ambition and pure laziness',
-    name: 'The Aspiring Go-Getter',
-    desc: 'You want to do everything everyone else does, but when it comes down to it, it\'s just too much effort. No pineapple on pizza — hard line — but you\'ll squeeze toothpaste from the middle without blinking. Night showers, socks off, pure freedom. Your whole vibe is a walking beige flag collection.',
+    rarity: 'Top 0.05%',
+    name: 'The Unstoppable Anomaly',
+    subtitle: 'Statistically impossible, empirically real',
+    desc: 'Wakes immediately on first alarm, then proceeds to violate every domestic norm ever written. Subtitles off, socks on, toilet paper backwards, standing in the bathroom — you are the most productive catastrophe the species has produced. Scientists have no framework for this.',
+    country: 'Australia', flag: '🇦🇺', color: '#0F172A',
+  },
+
+  // ── CR2: Morning + Snooze ─────────────────────────────────────────
+  {
+    rarity: 'Top 8%',
+    name: 'The Procrastinating Perfectionist',
+    subtitle: 'Perfect values, deeply flawed follow-through',
+    desc: 'In your head you are living a gold-standard productive life. In reality you are negotiating with an alarm clock for the third time. Your domestic standards are immaculate — ketchup in the fridge, toilet paper correctly oriented — but the gap between your vision and your morning routine is the stuff of legend.',
     country: 'Spain', flag: '🇪🇸', color: '#F59E0B',
   },
   {
-    s: false, e: true, n: true,
+    rarity: 'Top 15%',
+    name: 'The Forgivable Mess',
+    subtitle: 'Multiple alarms, charming excuses, zero consequences',
+    desc: 'TV volume must be a multiple of five or the day is already ruined. Pineapple on pizza is fine, actually. Alarms are more of a suggestion. You are a lot, but people keep you around because every room gets measurably better when you walk in.',
+    country: 'Italy', flag: '🇮🇹', color: '#F97316',
+  },
+  {
+    rarity: 'Top 12%',
+    name: 'The Harmonious Disaster',
+    subtitle: 'Blessed with terrifying luck and zero self-awareness',
+    desc: 'You set alarms with great optimism and then cheerfully ignore them. Toothpaste squeezed from the middle, TV volume irrelevant, somehow still on time-ish for things. Life keeps working out for you despite all available evidence suggesting it should not.',
+    country: 'Brazil', flag: '🇧🇷', color: '#EF4444',
+  },
+  {
+    rarity: 'Top 8%',
+    name: 'The Defiant Scrambler',
+    subtitle: 'Late everywhere, zero regrets, zero self-awareness',
+    desc: 'Always slightly behind schedule and completely certain it is the system\'s fault. Ketchup lives in the cupboard, toilet paper hangs backwards, and you have a fully developed philosophical argument for both. Infuriating. Somehow compelling company.',
+    country: 'France', flag: '🇫🇷', color: '#E11D48',
+  },
+  {
+    rarity: 'Top 3%',
+    name: 'The Brazen Chaotic',
+    subtitle: 'You are a lot. People have adapted or left.',
+    desc: 'Snooze veteran, socks-in-bed enthusiast, toothpaste tube in critical condition. The people around you have quietly adjusted their expectations downward. You haven\'t noticed. You\'re having a great time.',
+    country: 'United States', flag: '🇺🇸', color: '#DB2777',
+  },
+  {
+    rarity: 'Top 0.08%',
+    name: 'The Absurdist Survivor',
+    subtitle: 'Every alarm ignored, every norm dissolved, still thriving',
+    desc: 'Eight chaos points. Morning shower somehow still happening. The universe rewards this level of audacity with inexplicable results. You are living proof that the rules were always optional. There is no rational explanation for your continued success and everyone around you knows it.',
+    country: 'Jamaica', flag: '🇯🇲', color: '#7C3AED',
+  },
+
+  // ── CR3: Night + One Alarm ────────────────────────────────────────
+  {
+    rarity: 'Top 4%',
+    name: 'The Calculated Night Owl',
+    subtitle: 'Silent, ruthless, and keeping score',
+    desc: 'Night shower to flush out the day, one alarm, zero chaos — you operate like a cold and efficient process. Socially functional by day, privately resetting at night. You are judging everyone at all times and maintaining a very organised mental record of it.',
+    country: 'Japan', flag: '🇯🇵', color: '#10B981',
+  },
+  {
+    rarity: 'Top 10%',
+    name: 'The Aesthetic Nocturnal',
+    subtitle: 'Built a very specific inner world and it looks great in there',
+    desc: 'Night showers, one alarm, subtitles always on, mild pineapple tolerance — you have a thoughtful and gently idiosyncratic approach to life. You\'ve constructed a very specific personal universe. Visitors are occasionally permitted but must respect the ambiance.',
+    country: 'Sweden', flag: '🇸🇪', color: '#0D9488',
+  },
+  {
+    rarity: 'Top 10%',
+    name: 'The Functioning Paradox',
+    subtitle: 'Disciplined in routine, baffling in detail',
+    desc: 'Night shower for a clean mental reset, single alarm for morning structure, then toothpaste squeezed from the middle because consistency was never the goal. You are externally coherent and internally a mystery. People describe you as "fine but complicated."',
+    country: 'Argentina', flag: '🇦🇷', color: '#059669',
+  },
+  {
+    rarity: 'Top 6%',
+    name: 'The Methodical Madman',
+    subtitle: 'Follows own rules with terrifying precision',
+    desc: 'Disciplined enough to shower at night and rise on cue, eccentric enough to store ketchup in the cupboard and hang toilet paper the wrong direction. You have a complete internal logic system. Other people\'s rules are considered on a case-by-case basis and usually rejected.',
+    country: 'United Kingdom', flag: '🇬🇧', color: '#0891B2',
+  },
+  {
+    rarity: 'Top 2%',
+    name: 'The Dark Menace',
+    subtitle: 'Disciplined schedule, everything else: unreadable',
+    desc: 'Night shower, single alarm, socks on in bed, toothpaste mutilated, vibes: cold and unknowable. You are the most alarming person in any room despite having the most structured sleep routine. Whoever shares a home with you deserves a support group.',
+    country: 'Russia', flag: '🇷🇺', color: '#6D28D9',
+  },
+  {
+    rarity: 'Top 0.03%',
+    name: 'The Unhinged Vampire',
+    subtitle: 'Selectively disciplined, lawless in all other dimensions',
+    desc: 'Night shower, one alarm — then every single remaining habit executed in maximum chaos mode. Standing bathroom posture, subtitles off, socks on, toilet paper backwards. This level of selective rigour combined with total domestic anarchy is statistically near-impossible. Possibly supernatural.',
+    country: 'Romania', flag: '🇷🇴', color: '#4C1D95',
+  },
+
+  // ── CR4: Night + Snooze ───────────────────────────────────────────
+  {
     rarity: 'Top 9%',
-    subtitle: 'Zero excess, zero tolerance',
-    name: 'The Straight-Cut Minimalist',
-    desc: 'No subtitles, no socks, no fruit on pizza — you have crystal-clear preferences. You start the day with a morning shower and move through a set routine, but you\'ll occasionally squeeze toothpaste from the middle with zero thought, which is your most unexpected trait.',
-    country: 'Japan', flag: '🇯🇵', color: '#64748B',
+    name: 'The Harmless Sloth',
+    subtitle: 'Lazy, correct, and at peace with both',
+    desc: 'Night shower, five snoozes, and a completely law-abiding domestic life. Ketchup in the fridge, toilet paper the right way up — your habits are impeccable apart from the relationship with your alarm clock. You are lazy but you are right and that is its own kind of dignity.',
+    country: 'New Zealand', flag: '🇳🇿', color: '#8B5CF6',
+  },
+  {
+    rarity: 'Top 15%',
+    name: 'The Chronically Exhausted',
+    subtitle: 'Always tired, occasionally functional, somehow beloved',
+    desc: 'TV volume must be an even number or the chaos is already too much. You are tired and have always been tired. Pineapple on pizza is a source of small joy in a difficult world. You function, technically, and that is already an achievement requiring serious recognition.',
+    country: 'Spain', flag: '🇪🇸', color: '#7C3AED',
+  },
+  {
+    rarity: 'Top 11%',
+    name: 'The Cozy Mess',
+    subtitle: 'Comfort is a religion; your home is its messy temple',
+    desc: 'Warm night shower, aggressive snoozing, toothpaste squeezed wherever feels natural, TV volume a number that simply happened. You have constructed a life around maximum personal comfort. It looks like chaos from outside. From inside it is a sanctuary.',
+    country: 'Brazil', flag: '🇧🇷', color: '#A855F7',
+  },
+  {
+    rarity: 'Top 7%',
+    name: 'The Obstinate Slacker',
+    subtitle: 'Lazy with opinions. Many, specific, loud opinions.',
+    desc: 'Ketchup belongs in the cupboard because thermal palate preferences are scientifically real and you will argue this point at length. Toilet paper hangs backwards for reasons. You are slow to move but fast to theorise, with more opinions per productive hour than anyone in recorded history.',
+    country: 'France', flag: '🇫🇷', color: '#9333EA',
+  },
+  {
+    rarity: 'Top 2%',
+    name: 'The Walking Hazard',
+    subtitle: 'Blissfully unaware of the stress levels you generate',
+    desc: 'Night showers, multiple snoozes, socks in bed, toothpaste destroyed at the middle — you are a walking act of domestic chaos who somehow smells fine. People sharing your space report measurably elevated cortisol levels. You are having a genuinely lovely time.',
+    country: 'United States', flag: '🇺🇸', color: '#C026D3',
+  },
+  {
+    rarity: 'Top 0.05%',
+    name: 'The Rootless Destroyer',
+    subtitle: 'Every alarm snoozed. Every norm gently dismantled.',
+    desc: 'Eight chaos points. Night shower somehow still happening. Every alarm ignored, every domestic convention dissolved, zero apologies issued. The people who love you do so in spite of considerable evidence. They are the real heroes of this story.',
+    country: 'Australia', flag: '🇦🇺', color: '#1E293B',
   },
 ]
 
 function RadarChart({ scores, color }) {
   const cx = 100, cy = 100, R = 68, n = 5
-  const axes = ['CHAOS', 'CHARM', 'WIT', 'CHILL', 'WEIRD']
-  const vals = [scores.chaos, scores.charm, scores.wit, scores.chill, scores.weird]
+  const axes = ['CHAOS', 'REBEL', 'WILD', 'CHILL', 'WEIRD']
+  const vals = [scores.chaos, scores.rebel, scores.wild, scores.chill, scores.weird]
   const ang = (i) => -Math.PI / 2 + (2 * Math.PI / n) * i
   const pt = (i, r) => ({ x: cx + r * Math.cos(ang(i)), y: cy + r * Math.sin(ang(i)) })
   const poly = (pts) => pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
@@ -534,25 +647,46 @@ function encodeAnswers(answers) {
 }
 
 function ResultsScreen({ answers, onRestart }) {
-  // S: Structural Integrity (Q1,Q3,Q8,Q9) — love = structured choice
-  const S = [answers[0]==='love', answers[2]==='love', answers[7]==='love', answers[8]==='love'].filter(Boolean).length
-  // E: Efficiency Pragmatism (Q5,Q6,Q10) — love = efficient choice
-  const E = [answers[4]==='love', answers[5]==='love', answers[9]==='love'].filter(Boolean).length
-  // N: Normative Adherence (Q2 love=sit, Q4 hate=no-pineapple, Q7 hate=subtitles-off)
-  const N = [answers[1]==='love', answers[3]==='hate', answers[6]==='hate'].filter(Boolean).length
+  // ── Axis 1: Chrono-Routine (CR) — Q5 shower + Q6 alarm ──────────
+  // Q5: love=Morning, hate=Night | Q6: love=OneAlarm, hate=Snooze
+  const showerNight  = answers[4] === 'hate'
+  const alarmSnooze  = answers[5] === 'hate'
+  const cr = !showerNight && !alarmSnooze ? 0   // CR1 Morning+One
+           : !showerNight &&  alarmSnooze ? 1   // CR2 Morning+Snooze
+           :  showerNight && !alarmSnooze ? 2   // CR3 Night+One
+           :                               3   // CR4 Night+Snooze
 
-  const sHigh = S >= 2
-  const eHigh = E >= 2
-  const nHigh = N >= 2
+  // ── Axis 2: Micro-Chaos Quotient (MCQ) — 8 chaos triggers ───────
+  // Q1 hate=Under | Q2 hate=Stand | Q3 hate=Middle | Q4 love=Pineapple
+  // Q7 hate=SubOff | Q8 hate=OddVol | Q9 hate=Risky | Q10 love=SocksOn
+  const chaosFlags = [
+    answers[0] === 'hate',  // toilet paper under
+    answers[1] === 'hate',  // stand
+    answers[2] === 'hate',  // toothpaste middle
+    answers[3] === 'love',  // pineapple yes
+    answers[6] === 'hate',  // subtitles off
+    answers[7] === 'hate',  // odd volume
+    answers[8] === 'hate',  // risky/impulsive (Q9)
+    answers[9] === 'love',  // socks on
+  ]
+  const mcqPoints = chaosFlags.filter(Boolean).length
+  const mcqTier = mcqPoints <= 1 ? 0
+                : mcqPoints <= 3 ? 1
+                : mcqPoints === 4 ? 2
+                : mcqPoints === 5 ? 3
+                : mcqPoints <= 7 ? 4
+                : 5
 
-  const archetype = ARCHETYPES.find(a => a.s === sHigh && a.e === eHigh && a.n === nHigh) ?? ARCHETYPES[0]
+  const archetype = ARCHETYPES[cr * 6 + mcqTier]
 
+  // ── Radar axes ───────────────────────────────────────────────────
+  // CHAOS=overall mcq | REBEL=hygiene flags | WILD=food/impulse | CHILL=night-comfort | WEIRD=media
   const radar = {
-    chaos: (4 - S) / 4,
-    charm: N / 3,
-    wit: (S / 4 + E / 3) / 2,
-    chill: (3 - E) / 3,
-    weird: (3 - N) / 3,
+    chaos: mcqPoints / 8,
+    rebel: (chaosFlags[0] + chaosFlags[1] + chaosFlags[2]) / 3,
+    wild:  (chaosFlags[3] + chaosFlags[6]) / 2,
+    chill: (showerNight + alarmSnooze + chaosFlags[7]) / 3,
+    weird: (chaosFlags[4] + chaosFlags[5]) / 2,
   }
 
   const [copied, setCopied] = useState(false)
