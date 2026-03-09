@@ -11,7 +11,7 @@ export default function ContactPage() {
     // Opens the user's mail client with pre-filled fields
     const subject = encodeURIComponent('ThisOrThat Feedback')
     const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`)
-    window.location.href = `mailto:contact@thisorthat.pages.dev?subject=${subject}&body=${body}`
+    window.location.href = `mailto:wjdtjsdlf210@gmail.com?subject=${subject}&body=${body}`
     setSent(true)
   }
 
@@ -41,8 +41,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-800 text-sm mb-1">Email</div>
-                <a href="mailto:contact@thisorthat.pages.dev" className="text-[#0EA5E9] hover:underline text-sm">
-                  contact@thisorthat.pages.dev
+                <a href="mailto:wjdtjsdlf210@gmail.com" className="text-[#0EA5E9] hover:underline text-sm">
+                  wjdtjsdlf210@gmail.com
                 </a>
               </div>
             </div>

@@ -139,7 +139,7 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-bold text-slate-800 mb-3">Contact</h2>
             <p>
               If you have any questions about this Privacy Policy, please contact us at{' '}
-              <a href="mailto:contact@thisorthat.pages.dev" className="text-[#0EA5E9] hover:underline">contact@thisorthat.pages.dev</a>.
+              <a href="mailto:wjdtjsdlf210@gmail.com" className="text-[#0EA5E9] hover:underline">wjdtjsdlf210@gmail.com</a>.
             </p>
           </section>
 
