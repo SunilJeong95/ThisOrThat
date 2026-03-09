@@ -7,73 +7,71 @@ const AVATAR_URLS = [
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCb28WDK4Em_wua_veH-u1RtWOYNpAeDmBRMm1AumleNAsL5zdeLROFuscFyebk0BCrvag7XR7FcjvPGoGU5Y6zz_5uwIK6aEC26yrUTixOUlaDXz_Hjgfc9gct67yqSbJ4lyQ2oTAG_PILnzuVVdbsnas9OUJct5vI9XPFDpp2tOU0vAKF5mrVq-pMupdqenRFDY-_gtsaabHikvUVOk_iMldU3pNNilGbs9omjLjZtAEiyYAztrH06NkN16VIkoKBgsNa8DhQoPcz',
 ]
 
-const USER_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuA1uLzjl71SLBQuY4fnrCgWWDA-Hm9UXA9n7w4ZDvCya_MrL5Ale5JOeRzPkSJIfj5s9aoJjgTY4ZDcy7PXeGjcFKRtdSuiA6YfE1klIONZ1qA7XzTlNKs_bJPq5f5OgvE4WVp7UWngnq6hfpN9O7IRi1spixMKw7qKcjHpCHuADTUn_ACGxEdo8oEIG9erJB9GAHJ-ICRpU8dlHwBiNpfgVzQcU948peQEny35WcKjuKmNVDPchWCBpd3FHQjvGYvx0Pzo5Ecxy6iL'
-
 // S = Structural Integrity (Q1,Q3,Q8,Q9) | E = Efficiency (Q5,Q6,Q10) | N = Normative (Q2,Q4,Q7)
 const ARCHETYPES = [
   {
     s: true, e: true, n: true,
     rarity: 'Top 3%',
-    subtitleKo: '갓생 살다 기계가 되어버린',
-    nameKo: 'AI형 통제광',
-    descKo: '치약은 무조건 끝에서부터, 알람은 단 하나로 기상하는 당신은 인간미가 살짝 결여된 완벽주의자입니다. 냉장고 속 케첩 위치까지 정해져 있을 것 같은 당신의 아우라는 주변 사람들을 킹받게 하지만, 사실 당신 없으면 세상은 엉망이 될 거예요. 양말까지 신고 자는 그 철저한 자기관리, 솔직히 폼 미쳤습니다.',
-    country: '독일', flag: '🇩🇪', color: '#0EA5E9',
+    subtitle: 'Turned into a machine chasing the perfect life',
+    name: 'The AI Control Freak',
+    desc: 'Toilet paper over, one alarm, everything in its place — you\'re a perfectionist with a slight deficiency in human warmth. Your fridge probably has an assigned spot for every condiment. People find your aura insufferable, but honestly, the world would fall apart without you. Wearing socks to bed? That level of self-discipline is genuinely impressive.',
+    country: 'Germany', flag: '🇩🇪', color: '#0EA5E9',
   },
   {
     s: false, e: false, n: false,
     rarity: 'Top 5%',
-    subtitleKo: '근본 없는 혼돈의 파괴자',
-    nameKo: '풀네임 델루루',
-    descKo: '케첩은 찬장에 방치하고 치약은 중간부터 푹 짜버리는 당신의 손길에는 일말의 망설임도 없습니다. 파인애플 피자를 당당히 시키고 알람을 7개나 맞추는 당신은 이 시대의 진정한 쿨가이이자 혼돈의 빌런입니다. 뒤처리를 서서 하는 그 독특한 폼, 진짜 광기가 느껴져서 오히려 리스펙하게 되네요.',
-    country: '미국 플로리다', flag: '🇺🇸', color: '#FF6B00',
+    subtitle: 'The rootless destroyer of chaos',
+    name: 'Full Send Delulu',
+    desc: 'You squeeze toothpaste from the middle without hesitation, store ketchup in the cupboard like a free spirit, and order pineapple pizza with zero shame. With multiple alarms set and a standing bathroom routine, you are the true chaos villain of our generation. The audacity is honestly iconic.',
+    country: 'Florida, USA', flag: '🇺🇸', color: '#FF6B00',
   },
   {
     s: true, e: true, n: false,
     rarity: 'Top 8%',
-    subtitleKo: '효율에 미친',
-    nameKo: '스마트한 변태',
-    descKo: '밤에 샤워하고 양말까지 신어서 체온을 조절하는 당신의 모습은 흡사 정밀 기계와 같습니다. 모든 행동이 내일의 컨디션을 위해 계산된 것이며, TV 볼륨조차 짝수로 맞추는 그 섬세함은 경이롭기까지 합니다. 당신은 누구보다 빠르게 혼돈을 즐길 준비가 되어 있군요.',
-    country: '대한민국', flag: '🇰🇷', color: '#10B981',
+    subtitle: 'Clinically obsessed with efficiency',
+    name: 'The Smart Weirdo',
+    desc: 'Night showers and socks in bed for optimal body temperature — you operate like a precision machine, every action calculated for tomorrow\'s performance. Even your TV volume is a multiple of five. You\'re ready to enjoy chaos more efficiently than anyone else.',
+    country: 'South Korea', flag: '🇰🇷', color: '#10B981',
   },
   {
     s: true, e: false, n: false,
     rarity: 'Top 12%',
-    subtitleKo: '자막 없으면 대화 불가능한',
-    nameKo: '디테일 집착러',
-    descKo: '한국어 영화도 자막 없이는 안 보는 당신은 소리보다 텍스트를 더 믿는 정보 과잉 시대의 산물입니다. 겉으로는 멀쩡해 보이지만 속으로는 "저 사람 왜 치약을 중간부터 짜지?"라며 100가지 유죄 목록을 작성하고 있는 당신, 정말 킹받는 매력이 있네요.',
-    country: '핀란드', flag: '🇫🇮', color: '#8B5CF6',
+    subtitle: 'Cannot function without subtitles',
+    name: 'The Detail Obsessive',
+    desc: 'You watch movies with subtitles because you trust text more than sound — a true product of the information overload era. You look fine on the outside, but inside you\'re mentally filing 100 charges against anyone who squeezes toothpaste from the middle. Infuriating and weirdly charming.',
+    country: 'Finland', flag: '🇫🇮', color: '#8B5CF6',
   },
   {
     s: false, e: true, n: false,
     rarity: 'Top 7%',
-    subtitleKo: '관습을 찢어버린',
-    nameKo: '파격적 시그마',
-    descKo: '뒤처리를 서서 한다는 사실 하나만으로도 당신은 이미 상위 1%의 유니크함을 가졌습니다. 남들이 뭐라 하든 파인애플 피자를 먹고 케첩을 찬장에 방치하는 당신은 진정한 시그마 그 자체입니다. 아침 샤워에 알람 한 번 기상까지, 혼돈을 질서 있게 즐기는 유일무이한 존재입니다.',
-    country: '브라질', flag: '🇧🇷', color: '#EF4444',
+    subtitle: 'Shredded every convention',
+    name: 'The Radical Sigma',
+    desc: 'Standing up alone puts you in the top 1% of uniqueness. Pineapple pizza, ketchup in the cupboard — you do it all without apology. Morning showers, one alarm, out the door: you\'re a one-of-a-kind existence who enjoys chaos with surprising structure.',
+    country: 'Brazil', flag: '🇧🇷', color: '#EF4444',
   },
   {
     s: true, e: false, n: true,
     rarity: 'Top 10%',
-    subtitleKo: '근본에 죽고 근본에 사는',
-    nameKo: '선비형 꼰대',
-    descKo: '모든 물건은 제자리에, 모든 음식은 정석대로 먹어야 행복한 당신은 이 시대의 마지막 유교보이/걸입니다. 밤에 샤워하며 경건하게 하루를 마무리하지만 아침엔 알람을 5번이나 미루는 인간적인 모습이 킬포입니다. 누군가 케첩을 찬장에 넣는 걸 보는 순간, 당신의 눈에 지진이 일어나겠죠.',
-    country: '이탈리아', flag: '🇮🇹', color: '#059669',
+    subtitle: 'Living and dying by the rules',
+    name: 'The Principled Traditionalist',
+    desc: 'Everything in its place, every food eaten the correct way — you\'re the last rule-keeper standing in modern times. You end the day with a dignified night shower, yet somehow hit snooze five times every morning, which is honestly your most lovable flaw.',
+    country: 'Italy', flag: '🇮🇹', color: '#059669',
   },
   {
     s: false, e: false, n: true,
     rarity: 'Top 15%',
-    subtitleKo: '쾌락과 귀차니즘 사이를 유영하는',
-    nameKo: '갓생 호소인',
-    descKo: '남들 하는 건 다 하고 싶지만 막상 하려니 너무 귀찮은 당신! 피자에 파인애플은 절대 안 되지만 치약은 중간부터 짜버리는 그 모순적인 매력이 포인트입니다. 밤 샤워의 여유를 즐기고 양말 따위는 벗어 던진 채 자유를 만끽하는 당신의 아우라는 베이지 플래그의 집합체입니다.',
-    country: '스페인', flag: '🇪🇸', color: '#F59E0B',
+    subtitle: 'Drifting between ambition and pure laziness',
+    name: 'The Aspiring Go-Getter',
+    desc: 'You want to do everything everyone else does, but when it comes down to it, it\'s just too much effort. No pineapple on pizza — hard line — but you\'ll squeeze toothpaste from the middle without blinking. Night showers, socks off, pure freedom. Your whole vibe is a walking beige flag collection.',
+    country: 'Spain', flag: '🇪🇸', color: '#F59E0B',
   },
   {
     s: false, e: true, n: true,
     rarity: 'Top 9%',
-    subtitleKo: '군더더기 제로',
-    nameKo: '직선적 미니멀리스트',
-    descKo: '자막도 필요 없고, 양말도 답답하고, 피자에 과일이 올라가는 것도 용납 못 하는 당신은 아주 명확한 취향의 소유자입니다. 아침 샤워로 정신을 가다듬고 정해진 루틴대로 움직이지만, 가끔은 너무 무심하게 치약을 중간부터 짜버리는 반전 매력이 있습니다.',
-    country: '일본', flag: '🇯🇵', color: '#64748B',
+    subtitle: 'Zero excess, zero tolerance',
+    name: 'The Straight-Cut Minimalist',
+    desc: 'No subtitles, no socks, no fruit on pizza — you have crystal-clear preferences. You start the day with a morning shower and move through a set routine, but you\'ll occasionally squeeze toothpaste from the middle with zero thought, which is your most unexpected trait.',
+    country: 'Japan', flag: '🇯🇵', color: '#64748B',
   },
 ]
 
@@ -225,9 +223,9 @@ const questions = [
     labelColor: 'text-red-500',
     title: 'Phone Battery: Charge at 50% or 1%?',
     description: 'Do you plug in preemptively, or live on the edge until it dies?',
-    leftImg: '/img/Q9_50%.png',
+    leftImg: '/img/Q9_50pct.png',
     leftLabel: '50% Charge',
-    rightImg: '/img/Q9_1%.png',
+    rightImg: '/img/Q9_1pct.png',
     rightLabel: '1% Gamble',
     votes: '10.1k',
   },
@@ -262,7 +260,7 @@ function ResultsScreen({ answers, onRestart }) {
 
   const [copied, setCopied] = useState(false)
 
-  const shareText = `나는 ThisOrThat에서 '${archetype.nameKo}' (${archetype.rarity}) 유형이 나왔어! 😮 너도 해봐`
+  const shareText = `I got '${archetype.name}' (${archetype.rarity}) on ThisOrThat! 😮 Try it yourself`
   const shareUrl = window.location.href
 
   const handleShare = (platform) => {
@@ -345,9 +343,9 @@ function ResultsScreen({ answers, onRestart }) {
                 className="text-5xl font-black leading-none mt-2 mb-3"
                 style={{ backgroundImage: `linear-gradient(135deg, ${archetype.color}, ${archetype.color}99)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
               >
-                {archetype.nameKo}
+                {archetype.name}
               </h1>
-              <p className="text-slate-400 text-sm font-semibold">{archetype.subtitleKo}</p>
+              <p className="text-slate-400 text-sm font-semibold">{archetype.subtitle}</p>
             </div>
 
             {/* Radar chart */}
@@ -372,12 +370,12 @@ function ResultsScreen({ answers, onRestart }) {
 
           {/* Description card */}
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-            <p className="text-slate-600 text-sm leading-relaxed font-medium">{archetype.descKo}</p>
+            <p className="text-slate-600 text-sm leading-relaxed font-medium">{archetype.desc}</p>
           </div>
 
           {/* Share buttons */}
           <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col gap-4">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-400 text-center">결과 공유하기</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Share Your Result</p>
             <div className="grid grid-cols-3 gap-2">
               {/* KakaoTalk */}
               <button onClick={() => handleShare('kakao')} className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-slate-50 transition-colors">
@@ -386,7 +384,7 @@ function ResultsScreen({ answers, onRestart }) {
                     <path d="M12 3C6.477 3 2 6.582 2 11c0 2.866 1.736 5.394 4.357 6.968l-.938 3.507c-.07.26.2.471.432.327L9.9 19.568C10.585 19.688 11.286 19.75 12 19.75c5.523 0 10-3.582 10-8S17.523 3 12 3z"/>
                   </svg>
                 </div>
-                <span className="text-[11px] font-bold text-slate-600">카카오톡</span>
+                <span className="text-[11px] font-bold text-slate-600">KakaoTalk</span>
               </button>
               {/* Instagram */}
               <button onClick={() => handleShare('instagram')} className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-slate-50 transition-colors">
@@ -437,14 +435,14 @@ function ResultsScreen({ answers, onRestart }) {
             <div className="flex gap-3">
               <button className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
                 <span className="material-symbols-outlined text-[18px]">download</span>
-                저장
+                Save
               </button>
               <button
                 onClick={handleCopyLink}
                 className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
                 <span className="material-symbols-outlined text-[18px]">{copied ? 'check_circle' : 'link'}</span>
-                {copied ? '복사됨!' : '링크 복사'}
+                {copied ? 'Copied!' : 'Copy Link'}
               </button>
             </div>
           </div>
@@ -603,9 +601,7 @@ export default function QuizPage() {
                 fetchPriority="high"
                 draggable={false}
               />
-              {/* Dark gradient at bottom */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-              {/* Green glow on hover */}
               <div
                 className="absolute inset-0 transition-opacity duration-200 rounded-2xl"
                 style={{
@@ -614,7 +610,6 @@ export default function QuizPage() {
                   background: 'rgba(34,197,94,0.12)',
                 }}
               />
-              {/* Label */}
               <div className="absolute bottom-3 left-0 right-0 flex justify-center">
                 <span
                   className="px-3 py-1 rounded-full text-sm font-bold shadow-lg transition-all duration-200"
@@ -626,7 +621,6 @@ export default function QuizPage() {
                   {question.leftLabel}
                 </span>
               </div>
-              {/* Keyboard hint */}
               <div className="absolute top-2.5 left-2.5 hidden md:flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full">
                 <span className="text-white/70 text-[10px] font-mono">← Left</span>
               </div>
@@ -655,7 +649,6 @@ export default function QuizPage() {
                 draggable={false}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-              {/* Red glow on hover */}
               <div
                 className="absolute inset-0 transition-opacity duration-200 rounded-2xl"
                 style={{
@@ -664,7 +657,6 @@ export default function QuizPage() {
                   background: 'rgba(239,68,68,0.12)',
                 }}
               />
-              {/* Label */}
               <div className="absolute bottom-3 left-0 right-0 flex justify-center">
                 <span
                   className="px-3 py-1 rounded-full text-sm font-bold shadow-lg transition-all duration-200"
@@ -676,7 +668,6 @@ export default function QuizPage() {
                   {question.rightLabel}
                 </span>
               </div>
-              {/* Keyboard hint */}
               <div className="absolute top-2.5 right-2.5 hidden md:flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full">
                 <span className="text-white/70 text-[10px] font-mono">Right →</span>
               </div>
@@ -700,7 +691,7 @@ export default function QuizPage() {
 
         {/* Tap hint for mobile */}
         <p className="mt-4 text-xs text-slate-400 font-medium text-center md:hidden">
-          사진을 탭해서 선택하세요
+          Tap a photo to choose
         </p>
       </main>
     </div>
