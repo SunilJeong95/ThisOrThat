@@ -130,11 +130,8 @@ function measureLines(ctx, text, maxWidth) {
 }
 
 async function generateShareImage(archetype, radar) {
-  // Parallelize: font loading (with 1.5s timeout) + flag image fetch
-  const [, flagImg] = await Promise.all([
-    Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]),
-    loadTwemojiImg(archetype.flag),
-  ])
+  // Wait for Spline Sans with a short timeout — fall back to system font in WebViews
+  await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 300))])
 
   const W = 900
   const FONT = '"Spline Sans", system-ui, sans-serif'
@@ -257,18 +254,15 @@ async function generateShareImage(archetype, radar) {
   ctx.beginPath(); ctx.arc(fcX, fcY, 26, 0, Math.PI * 2)
   ctx.fillStyle = 'white'; ctx.fill()
   ctx.strokeStyle = '#E2E8F0'; ctx.lineWidth = 1; ctx.stroke()
-  if (flagImg) ctx.drawImage(flagImg, fcX - 16, fcY - 16, 32, 32)
+  ctx.font = '26px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText(archetype.flag, fcX, fcY)
+  ctx.textBaseline = 'alphabetic'
 
   const textX = fcX + 40
   ctx.font = `bold 11px ${FONT}`; ctx.fillStyle = '#94A3B8'; ctx.textAlign = 'left'
   ctx.fillText('SOULMATE LOCATION', textX, y + 30)
   ctx.font = `bold 22px ${FONT}`; ctx.fillStyle = '#1E293B'
   ctx.fillText(archetype.country, textX, y + 56)
-  // Inline flag after country name
-  if (flagImg) {
-    const cnW = ctx.measureText(archetype.country).width
-    ctx.drawImage(flagImg, textX + cnW + 8, y + 40, 18, 18)
-  }
   // Heart (right side)
   ctx.fillStyle = C; ctx.textAlign = 'center'
   ctx.font = `20px serif`
@@ -572,10 +566,10 @@ function ResultsScreen({ answers, onRestart }) {
     generateShareImage(archetype, radar).then(canvas => {
       canvas.toBlob(blob => {
         if (!blob) return
-        shareFileRef.current = new File([blob], 'thisorthat-result.png', { type: 'image/png' })
+        shareFileRef.current = new File([blob], 'thisorthat-result.jpg', { type: 'image/jpeg' })
         shareBlobUrlRef.current = URL.createObjectURL(blob)
         setImgReady(true)
-      }, 'image/png')
+      }, 'image/jpeg', 0.92)
     }).catch(() => {})
     return () => { if (shareBlobUrlRef.current) URL.revokeObjectURL(shareBlobUrlRef.current) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -627,7 +621,7 @@ function ResultsScreen({ answers, onRestart }) {
   const triggerDownload = (blobUrl) => {
     const a = document.createElement('a')
     a.href = blobUrl
-    a.download = 'thisorthat-result.png'
+    a.download = 'thisorthat-result.jpg'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
