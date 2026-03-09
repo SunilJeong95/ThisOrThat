@@ -54,6 +54,7 @@ function drawRadarCanvas(ctx, vals, color, cx, cy, R) {
   const ang = i => -Math.PI / 2 + (2 * Math.PI / n) * i
   const pt = (i, r) => ({ x: cx + r * Math.cos(ang(i)), y: cy + r * Math.sin(ang(i)) })
 
+  // Grid rings
   ctx.strokeStyle = '#E2E8F0'
   ctx.lineWidth = 1.5
   for (const s of [0.25, 0.5, 0.75, 1]) {
@@ -65,120 +66,175 @@ function drawRadarCanvas(ctx, vals, color, cx, cy, R) {
     ctx.closePath()
     ctx.stroke()
   }
+  // Spokes
   for (let i = 0; i < n; i++) {
     const p = pt(i, R)
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(p.x, p.y); ctx.stroke()
   }
 
+  // Data polygon fill
   ctx.beginPath()
   for (let i = 0; i < n; i++) {
     const p = pt(i, R * Math.max(vals[i], 0.06))
     i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)
   }
   ctx.closePath()
-  ctx.fillStyle = `${color}33`
+  ctx.fillStyle = `${color}28`
   ctx.fill()
   ctx.strokeStyle = color
-  ctx.lineWidth = 3
+  ctx.lineWidth = 2.5
   ctx.stroke()
 
+  // Dots
   for (let i = 0; i < n; i++) {
     const p = pt(i, R * Math.max(vals[i], 0.06))
-    ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI * 2)
+    ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2)
     ctx.fillStyle = color; ctx.fill()
-    ctx.strokeStyle = 'white'; ctx.lineWidth = 2.5; ctx.stroke()
+    ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke()
   }
 
-  ctx.font = 'bold 15px -apple-system, system-ui, sans-serif'
+  // Axis labels
+  ctx.font = 'bold 14px -apple-system, system-ui, sans-serif'
   ctx.textAlign = 'center'
   for (let i = 0; i < n; i++) {
-    const p = pt(i, R + 26)
-    ctx.fillStyle = vals[i] > 0.6 ? color : '#94a3b8'
-    ctx.fillText(axes[i], p.x, p.y + 6)
+    const p = pt(i, R + 24)
+    ctx.fillStyle = vals[i] > 0.55 ? color : '#94a3b8'
+    ctx.fillText(axes[i], p.x, p.y + 5)
   }
 }
 
+// Load a Twemoji SVG as HTMLImageElement (for canvas drawImage)
+function loadTwemojiImg(emoji) {
+  return new Promise(resolve => {
+    const cp = [...emoji].map(c => c.codePointAt(0).toString(16)).join('-')
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
+    img.src = `https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/${cp}.svg`
+  })
+}
+
 async function generateShareImage(archetype, radar) {
-  const W = 800, H = 1200, PAD = 64
+  const W = 800, H = 1200
   const canvas = document.createElement('canvas')
   canvas.width = W
   canvas.height = H
   const ctx = canvas.getContext('2d')
-  const color = archetype.color
+  const C = archetype.color
 
-  ctx.fillStyle = '#FAFAFA'
+  // ── Background ─────────────────────────────────────────────────
+  ctx.fillStyle = '#EEF2F7'
   ctx.fillRect(0, 0, W, H)
-  ctx.fillStyle = color
-  ctx.fillRect(0, 0, W, 10)
 
-  let y = 60
+  // ── Dark gradient header block ──────────────────────────────────
+  const HEADER_H = 450
+  const grad = ctx.createLinearGradient(0, 0, W, HEADER_H)
+  grad.addColorStop(0, '#0f172a')
+  grad.addColorStop(1, C)
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, W, HEADER_H)
 
-  // Badge
-  ctx.font = 'bold 14px -apple-system, system-ui, sans-serif'
-  const badgeText = 'RARE PERSONALITY TYPE'
-  const bw = ctx.measureText(badgeText).width + 44
-  drawRoundedRect(ctx, (W - bw) / 2, y, bw, 36, 18)
-  ctx.fillStyle = `${color}22`; ctx.fill()
-  ctx.fillStyle = color; ctx.textAlign = 'center'
-  ctx.fillText(badgeText, W / 2, y + 23)
-  y += 56
+  // Decorative circles (subtle depth)
+  ctx.save()
+  ctx.globalAlpha = 0.07
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath(); ctx.arc(700, -10, 220, 0, Math.PI * 2); ctx.fill()
+  ctx.beginPath(); ctx.arc(30, 390, 110, 0, Math.PI * 2); ctx.fill()
+  ctx.globalAlpha = 0.04
+  ctx.beginPath(); ctx.arc(400, 220, 330, 0, Math.PI * 2); ctx.fill()
+  ctx.restore()
 
-  // Rarity
-  ctx.fillStyle = '#94a3b8'
-  ctx.font = 'bold 30px -apple-system, system-ui, sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText(archetype.rarity, W / 2, y)
-  y += 56
-
-  // Archetype name
-  ctx.fillStyle = color
-  const fontSize = archetype.name.length > 18 ? 52 : archetype.name.length > 12 ? 62 : 72
-  ctx.font = `900 ${fontSize}px -apple-system, system-ui, sans-serif`
-  ctx.textAlign = 'center'
-  ctx.fillText(archetype.name, W / 2, y)
-  y += 44
-
-  // Subtitle
-  ctx.fillStyle = '#94a3b8'
-  ctx.font = '600 22px -apple-system, system-ui, sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText(archetype.subtitle, W / 2, y)
-  y += 52
-
-  // Radar chart
-  const radarCY = y + 148
-  const vals = [radar.chaos, radar.charm, radar.wit, radar.chill, radar.weird]
-  drawRadarCanvas(ctx, vals, color, W / 2, radarCY, 130)
-  y = radarCY + 130 + 48
-
-  // Country box
-  drawRoundedRect(ctx, PAD, y, W - PAD * 2, 82, 20)
-  ctx.fillStyle = '#f1f5f9'; ctx.fill()
-  ctx.fillStyle = '#94a3b8'
+  // Brand
+  ctx.fillStyle = 'rgba(255,255,255,0.42)'
   ctx.font = 'bold 13px -apple-system, system-ui, sans-serif'
   ctx.textAlign = 'left'
-  ctx.fillText('SOULMATE LOCATION', PAD + 24, y + 30)
-  ctx.fillStyle = '#1e293b'
-  ctx.font = 'bold 27px -apple-system, system-ui, sans-serif'
-  ctx.fillText(`${archetype.country} ${archetype.flag}`, PAD + 24, y + 64)
-  y += 110
+  ctx.fillText('THIS  OR  THAT', 48, 46)
 
-  // Divider
-  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1
-  ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke()
-  y += 36
+  // Rarity pill
+  ctx.font = 'bold 13px -apple-system, system-ui, sans-serif'
+  const rw = ctx.measureText(archetype.rarity).width + 40
+  drawRoundedRect(ctx, 48, 60, rw, 32, 16)
+  ctx.fillStyle = 'rgba(255,255,255,0.15)'
+  ctx.fill()
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)'
+  ctx.lineWidth = 1
+  ctx.stroke()
+  ctx.fillStyle = 'white'
+  ctx.fillText(archetype.rarity, 68, 81)
 
-  // Description
-  ctx.fillStyle = '#64748b'
+  // Archetype name (large, white, left-aligned)
+  const nl = archetype.name.length
+  const nfs = nl >= 24 ? 46 : nl >= 18 ? 54 : nl >= 14 ? 62 : 70
+  ctx.fillStyle = 'white'
+  ctx.font = `900 ${nfs}px -apple-system, system-ui, sans-serif`
+  ctx.textAlign = 'left'
+  // word-wrap
+  const nameWords = archetype.name.split(' ')
+  const nameLines = []
+  let cur = ''
+  for (const w of nameWords) {
+    const test = cur ? cur + ' ' + w : w
+    if (ctx.measureText(test).width > W - 96 && cur) { nameLines.push(cur); cur = w }
+    else { cur = test }
+  }
+  nameLines.push(cur)
+  const nameY = 170
+  nameLines.forEach((ln, i) => ctx.fillText(ln, 48, nameY + i * nfs * 1.15))
+
+  // Subtitle
+  const subY = nameY + nameLines.length * nfs * 1.15 + 14
+  ctx.fillStyle = 'rgba(255,255,255,0.62)'
   ctx.font = '500 19px -apple-system, system-ui, sans-serif'
-  ctx.textAlign = 'center'
-  wrapCanvasText(ctx, archetype.desc, W / 2, y, W - PAD * 2, 30)
+  ctx.textAlign = 'left'
+  ctx.fillText(archetype.subtitle, 48, subY)
 
-  // Watermark
-  ctx.fillStyle = '#cbd5e1'
-  ctx.font = 'bold 18px -apple-system, system-ui, sans-serif'
+  // Country (bottom of header, with Twemoji flag)
+  ctx.fillStyle = 'rgba(255,255,255,0.42)'
+  ctx.font = 'bold 11px -apple-system, system-ui, sans-serif'
+  ctx.fillText('SOULMATE LOCATION', 48, HEADER_H - 64)
+  const flagImg = await loadTwemojiImg(archetype.flag)
+  if (flagImg) {
+    ctx.drawImage(flagImg, 48, HEADER_H - 52, 28, 28)
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'
+    ctx.font = 'bold 22px -apple-system, system-ui, sans-serif'
+    ctx.fillText(archetype.country, 84, HEADER_H - 32)
+  } else {
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'
+    ctx.font = 'bold 22px -apple-system, system-ui, sans-serif'
+    ctx.fillText(`${archetype.flag}  ${archetype.country}`, 48, HEADER_H - 32)
+  }
+
+  // ── White content card ──────────────────────────────────────────
+  const CARD_X = 24, CARD_Y = HEADER_H - 32
+  const CARD_W = W - CARD_X * 2, CARD_H = H - CARD_Y - 20
+  drawRoundedRect(ctx, CARD_X, CARD_Y, CARD_W, CARD_H, 28)
+  ctx.fillStyle = 'white'
+  ctx.fill()
+
+  // ── Radar chart ─────────────────────────────────────────────────
+  const radarCX = W / 2
+  const radarCY = CARD_Y + 178
+  const radarR = 122
+  const vals = [radar.chaos, radar.charm, radar.wit, radar.chill, radar.weird]
+  drawRadarCanvas(ctx, vals, C, radarCX, radarCY, radarR)
+
+  // ── Thin divider ────────────────────────────────────────────────
+  const divY = radarCY + radarR + 52
+  ctx.strokeStyle = '#E2E8F0'; ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(CARD_X + 40, divY); ctx.lineTo(W - CARD_X - 40, divY); ctx.stroke()
+
+  // ── Description ─────────────────────────────────────────────────
+  ctx.fillStyle = '#64748b'
+  ctx.font = '16px -apple-system, system-ui, sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText('thisorthat.pages.dev', W / 2, H - 32)
+  wrapCanvasText(ctx, archetype.desc, W / 2, divY + 32, W - 96, 26)
+
+  // ── Watermark ────────────────────────────────────────────────────
+  ctx.fillStyle = '#CBD5E1'
+  ctx.font = 'bold 14px -apple-system, system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('thisorthat.pages.dev', W / 2, H - 18)
 
   return canvas
 }
@@ -497,14 +553,24 @@ function ResultsScreen({ answers, onRestart }) {
     if (urls[platform]) window.open(urls[platform], '_blank', 'noopener,noreferrer')
   }
 
+  // Detect in-app browsers (KakaoTalk, Instagram, Line, …) that block Web Share / <a download>
+  const isInAppBrowser = /KAKAO|KAKAOTALK|Line\/|Instagram|FBAV|FBAN|Snapchat/i.test(navigator.userAgent)
+
   // Synchronous — no await before navigator.share, preserves iOS/Android user gesture context
   const handleDownload = () => {
     if (!imgReady) return
     const file = shareFileRef.current
     const blobUrl = shareBlobUrlRef.current
 
+    // KakaoTalk / in-app browsers block both navigator.share(files) and <a download>.
+    // Opening the blob URL as a new page lets the user long-press → Save on Android/iOS.
+    if (isInAppBrowser) {
+      window.open(blobUrl, '_blank', 'noopener')
+      return
+    }
+
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      // iOS 15+ & Android Chrome: opens native share sheet → "Save Image" / "Save to Photos"
+      // iOS Safari 15+ & Android Chrome: native share sheet → "Save Image" / "Save to Photos"
       navigator.share({ files: [file], title: 'My ThisOrThat Result' }).catch(e => {
         if (e.name !== 'AbortError') triggerDownload(blobUrl)
       })
@@ -667,7 +733,7 @@ function ResultsScreen({ answers, onRestart }) {
                 className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[18px]">{imgReady ? 'download' : 'hourglass_empty'}</span>
-                {imgReady ? 'Save' : '...'}
+                {imgReady ? (isInAppBrowser ? 'Save (long-press)' : 'Save') : '...'}
               </button>
               <button
                 onClick={handleCopyLink}
