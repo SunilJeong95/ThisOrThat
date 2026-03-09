@@ -115,126 +115,177 @@ function loadTwemojiImg(emoji) {
   })
 }
 
-async function generateShareImage(archetype, radar) {
-  const W = 800, H = 1200
-  const canvas = document.createElement('canvas')
-  canvas.width = W
-  canvas.height = H
-  const ctx = canvas.getContext('2d')
-  const C = archetype.color
-
-  // ── Background ─────────────────────────────────────────────────
-  ctx.fillStyle = '#EEF2F7'
-  ctx.fillRect(0, 0, W, H)
-
-  // ── Dark gradient header block ──────────────────────────────────
-  const HEADER_H = 450
-  const grad = ctx.createLinearGradient(0, 0, W, HEADER_H)
-  grad.addColorStop(0, '#0f172a')
-  grad.addColorStop(1, C)
-  ctx.fillStyle = grad
-  ctx.fillRect(0, 0, W, HEADER_H)
-
-  // Decorative circles (subtle depth)
-  ctx.save()
-  ctx.globalAlpha = 0.07
-  ctx.fillStyle = '#ffffff'
-  ctx.beginPath(); ctx.arc(700, -10, 220, 0, Math.PI * 2); ctx.fill()
-  ctx.beginPath(); ctx.arc(30, 390, 110, 0, Math.PI * 2); ctx.fill()
-  ctx.globalAlpha = 0.04
-  ctx.beginPath(); ctx.arc(400, 220, 330, 0, Math.PI * 2); ctx.fill()
-  ctx.restore()
-
-  // Brand
-  ctx.fillStyle = 'rgba(255,255,255,0.42)'
-  ctx.font = 'bold 13px -apple-system, system-ui, sans-serif'
-  ctx.textAlign = 'left'
-  ctx.fillText('THIS  OR  THAT', 48, 46)
-
-  // Rarity pill
-  ctx.font = 'bold 13px -apple-system, system-ui, sans-serif'
-  const rw = ctx.measureText(archetype.rarity).width + 40
-  drawRoundedRect(ctx, 48, 60, rw, 32, 16)
-  ctx.fillStyle = 'rgba(255,255,255,0.15)'
-  ctx.fill()
-  ctx.strokeStyle = 'rgba(255,255,255,0.35)'
-  ctx.lineWidth = 1
-  ctx.stroke()
-  ctx.fillStyle = 'white'
-  ctx.fillText(archetype.rarity, 68, 81)
-
-  // Archetype name (large, white, left-aligned)
-  const nl = archetype.name.length
-  const nfs = nl >= 24 ? 46 : nl >= 18 ? 54 : nl >= 14 ? 62 : 70
-  ctx.fillStyle = 'white'
-  ctx.font = `900 ${nfs}px -apple-system, system-ui, sans-serif`
-  ctx.textAlign = 'left'
-  // word-wrap
-  const nameWords = archetype.name.split(' ')
-  const nameLines = []
+// Word-wrap helper that returns an array of lines (for length-aware layout)
+function measureLines(ctx, text, maxWidth) {
+  const words = text.split(' ')
+  const lines = []
   let cur = ''
-  for (const w of nameWords) {
+  for (const w of words) {
     const test = cur ? cur + ' ' + w : w
-    if (ctx.measureText(test).width > W - 96 && cur) { nameLines.push(cur); cur = w }
+    if (ctx.measureText(test).width > maxWidth && cur) { lines.push(cur); cur = w }
     else { cur = test }
   }
-  nameLines.push(cur)
-  const nameY = 170
-  nameLines.forEach((ln, i) => ctx.fillText(ln, 48, nameY + i * nfs * 1.15))
+  if (cur) lines.push(cur)
+  return lines
+}
+
+async function generateShareImage(archetype, radar) {
+  // Ensure web fonts (Spline Sans) are ready before drawing
+  await document.fonts.ready
+
+  const W = 900
+  const FONT = '"Spline Sans", system-ui, sans-serif'
+  const C = archetype.color
+  const OUTER = 32       // outer margin
+  const CARD_PX = 44     // card horizontal inner padding
+  const CARD_PT = 44     // card top inner padding
+  const CARD_PB = 40     // card bottom inner padding
+
+  // ── Pre-measure to compute canvas height ────────────────────
+  const mc = document.createElement('canvas')
+  mc.width = W; mc.height = 2
+  const mctx = mc.getContext('2d')
+  const innerW = W - OUTER * 2 - CARD_PX * 2
+
+  const nl = archetype.name.length
+  const nfs = nl >= 24 ? 52 : nl >= 18 ? 60 : nl >= 14 ? 70 : 78
+  mctx.font = `900 ${nfs}px ${FONT}`
+  const nameLines = measureLines(mctx, archetype.name, innerW)
+
+  const DESC_FS = 17, DESC_LH = 28
+  mctx.font = `500 ${DESC_FS}px ${FONT}`
+  const descLines = measureLines(mctx, archetype.desc, innerW)
+
+  const BADGE_H = 34
+  const RARITY_H = 36
+  const NAME_LH = nfs * 1.15
+  const NAME_H = nfs + (nameLines.length - 1) * NAME_LH
+  const SUBTITLE_H = 22
+  const RADAR_R = 130
+  const RADAR_ZONE = (RADAR_R + 28) * 2  // includes label overhang
+  const COUNTRY_H = 80
+
+  const mainH = (
+    CARD_PT + BADGE_H + 16 + RARITY_H + 8 +
+    NAME_H + 14 + SUBTITLE_H + 30 +
+    RADAR_ZONE + 28 + COUNTRY_H + CARD_PB
+  )
+  const descH = CARD_PT + descLines.length * DESC_LH + CARD_PB
+  const H = OUTER + mainH + 20 + descH + 52 + OUTER
+
+  // ── Create canvas ────────────────────────────────────────────
+  const canvas = document.createElement('canvas')
+  canvas.width = W
+  canvas.height = Math.round(H)
+  const ctx = canvas.getContext('2d')
+
+  // ── Background: #FAFAFA + dot pattern ───────────────────────
+  ctx.fillStyle = '#FAFAFA'
+  ctx.fillRect(0, 0, W, H)
+  ctx.fillStyle = '#CBD5E1'
+  for (let x = 12; x < W; x += 24)
+    for (let y = 12; y < H; y += 24) {
+      ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI * 2); ctx.fill()
+    }
+
+  // Background glow blobs (matching the page)
+  const g1 = ctx.createRadialGradient(W * 0.2, H * 0.15, 0, W * 0.2, H * 0.15, 320)
+  g1.addColorStop(0, 'rgba(186,230,253,0.45)'); g1.addColorStop(1, 'rgba(186,230,253,0)')
+  ctx.fillStyle = g1; ctx.fillRect(0, 0, W, H)
+  const g2 = ctx.createRadialGradient(W * 0.82, H * 0.82, 0, W * 0.82, H * 0.82, 260)
+  g2.addColorStop(0, 'rgba(254,215,170,0.45)'); g2.addColorStop(1, 'rgba(254,215,170,0)')
+  ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H)
+
+  // ── Main card shadow ─────────────────────────────────────────
+  ctx.save(); ctx.globalAlpha = 0.07
+  drawRoundedRect(ctx, OUTER + 4, OUTER + 12, W - OUTER * 2, mainH, 40)
+  ctx.fillStyle = '#000'; ctx.fill()
+  ctx.restore()
+
+  // ── Main white card ──────────────────────────────────────────
+  drawRoundedRect(ctx, OUTER, OUTER, W - OUTER * 2, mainH, 40)
+  ctx.fillStyle = 'white'; ctx.fill()
+  ctx.strokeStyle = '#F1F5F9'; ctx.lineWidth = 1; ctx.stroke()
+
+  // ── Content cursor ───────────────────────────────────────────
+  let y = OUTER + CARD_PT
+
+  // Badge
+  ctx.font = `bold 13px ${FONT}`
+  const badgeText = 'Rare Personality Type'
+  const bw = ctx.measureText(badgeText).width + 40
+  drawRoundedRect(ctx, (W - bw) / 2, y, bw, BADGE_H, 17)
+  ctx.fillStyle = `${C}1a`; ctx.fill()
+  ctx.fillStyle = C; ctx.textAlign = 'center'
+  ctx.fillText(badgeText, W / 2, y + 22)
+  y += BADGE_H + 16
+
+  // Rarity
+  ctx.font = `800 28px ${FONT}`
+  ctx.fillStyle = '#94A3B8'; ctx.textAlign = 'center'
+  ctx.fillText(archetype.rarity, W / 2, y + 28)
+  y += RARITY_H + 8
+
+  // Name (archetype color, font-black, centered)
+  ctx.font = `900 ${nfs}px ${FONT}`
+  ctx.fillStyle = C; ctx.textAlign = 'center'
+  nameLines.forEach((ln, i) => ctx.fillText(ln, W / 2, y + nfs + i * NAME_LH))
+  y += NAME_H + 14
 
   // Subtitle
-  const subY = nameY + nameLines.length * nfs * 1.15 + 14
-  ctx.fillStyle = 'rgba(255,255,255,0.62)'
-  ctx.font = '500 19px -apple-system, system-ui, sans-serif'
-  ctx.textAlign = 'left'
-  ctx.fillText(archetype.subtitle, 48, subY)
+  ctx.font = `600 18px ${FONT}`
+  ctx.fillStyle = '#94A3B8'; ctx.textAlign = 'center'
+  ctx.fillText(archetype.subtitle, W / 2, y + SUBTITLE_H)
+  y += SUBTITLE_H + 30
 
-  // Country (bottom of header, with Twemoji flag)
-  ctx.fillStyle = 'rgba(255,255,255,0.42)'
-  ctx.font = 'bold 11px -apple-system, system-ui, sans-serif'
-  ctx.fillText('SOULMATE LOCATION', 48, HEADER_H - 64)
+  // Radar chart
+  const radarCY = y + RADAR_R + 14
+  drawRadarCanvas(ctx, [radar.chaos, radar.charm, radar.wit, radar.chill, radar.weird], C, W / 2, radarCY, RADAR_R)
+  y += RADAR_ZONE + 28
+
+  // Country box
   const flagImg = await loadTwemojiImg(archetype.flag)
+  const cbX = OUTER + CARD_PX, cbW = W - OUTER * 2 - CARD_PX * 2
+  drawRoundedRect(ctx, cbX, y, cbW, COUNTRY_H, 20)
+  ctx.fillStyle = '#F8FAFC'; ctx.fill()
+  ctx.strokeStyle = '#F1F5F9'; ctx.lineWidth = 1; ctx.stroke()
+
+  // Flag circle
+  const fcX = cbX + 40, fcY = y + COUNTRY_H / 2
+  ctx.beginPath(); ctx.arc(fcX, fcY, 26, 0, Math.PI * 2)
+  ctx.fillStyle = 'white'; ctx.fill()
+  ctx.strokeStyle = '#E2E8F0'; ctx.lineWidth = 1; ctx.stroke()
+  if (flagImg) ctx.drawImage(flagImg, fcX - 16, fcY - 16, 32, 32)
+
+  const textX = fcX + 40
+  ctx.font = `bold 11px ${FONT}`; ctx.fillStyle = '#94A3B8'; ctx.textAlign = 'left'
+  ctx.fillText('SOULMATE LOCATION', textX, y + 30)
+  ctx.font = `bold 22px ${FONT}`; ctx.fillStyle = '#1E293B'
+  ctx.fillText(archetype.country, textX, y + 56)
+  // Inline flag after country name
   if (flagImg) {
-    ctx.drawImage(flagImg, 48, HEADER_H - 52, 28, 28)
-    ctx.fillStyle = 'rgba(255,255,255,0.92)'
-    ctx.font = 'bold 22px -apple-system, system-ui, sans-serif'
-    ctx.fillText(archetype.country, 84, HEADER_H - 32)
-  } else {
-    ctx.fillStyle = 'rgba(255,255,255,0.92)'
-    ctx.font = 'bold 22px -apple-system, system-ui, sans-serif'
-    ctx.fillText(`${archetype.flag}  ${archetype.country}`, 48, HEADER_H - 32)
+    const cnW = ctx.measureText(archetype.country).width
+    ctx.drawImage(flagImg, textX + cnW + 8, y + 40, 18, 18)
   }
+  // Heart (right side)
+  ctx.fillStyle = C; ctx.textAlign = 'center'
+  ctx.font = `20px serif`
+  ctx.fillText('♥', cbX + cbW - 32, fcY + 7)
 
-  // ── White content card ──────────────────────────────────────────
-  const CARD_X = 24, CARD_Y = HEADER_H - 32
-  const CARD_W = W - CARD_X * 2, CARD_H = H - CARD_Y - 20
-  drawRoundedRect(ctx, CARD_X, CARD_Y, CARD_W, CARD_H, 28)
-  ctx.fillStyle = 'white'
-  ctx.fill()
+  // ── Description card ─────────────────────────────────────────
+  const dcY = OUTER + mainH + 20
+  drawRoundedRect(ctx, OUTER, dcY, W - OUTER * 2, descH, 28)
+  ctx.fillStyle = 'white'; ctx.fill()
+  ctx.strokeStyle = '#F1F5F9'; ctx.lineWidth = 1; ctx.stroke()
 
-  // ── Radar chart ─────────────────────────────────────────────────
-  const radarCX = W / 2
-  const radarCY = CARD_Y + 178
-  const radarR = 122
-  const vals = [radar.chaos, radar.charm, radar.wit, radar.chill, radar.weird]
-  drawRadarCanvas(ctx, vals, C, radarCX, radarCY, radarR)
+  ctx.font = `500 ${DESC_FS}px ${FONT}`; ctx.fillStyle = '#475569'; ctx.textAlign = 'center'
+  descLines.forEach((ln, i) =>
+    ctx.fillText(ln, W / 2, dcY + CARD_PT + DESC_FS + i * DESC_LH)
+  )
 
-  // ── Thin divider ────────────────────────────────────────────────
-  const divY = radarCY + radarR + 52
-  ctx.strokeStyle = '#E2E8F0'; ctx.lineWidth = 1
-  ctx.beginPath(); ctx.moveTo(CARD_X + 40, divY); ctx.lineTo(W - CARD_X - 40, divY); ctx.stroke()
-
-  // ── Description ─────────────────────────────────────────────────
-  ctx.fillStyle = '#64748b'
-  ctx.font = '16px -apple-system, system-ui, sans-serif'
-  ctx.textAlign = 'center'
-  wrapCanvasText(ctx, archetype.desc, W / 2, divY + 32, W - 96, 26)
-
-  // ── Watermark ────────────────────────────────────────────────────
-  ctx.fillStyle = '#CBD5E1'
-  ctx.font = 'bold 14px -apple-system, system-ui, sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText('thisorthat.pages.dev', W / 2, H - 18)
+  // ── Watermark ─────────────────────────────────────────────────
+  ctx.font = `bold 14px ${FONT}`; ctx.fillStyle = '#CBD5E1'; ctx.textAlign = 'center'
+  ctx.fillText('thisorthat.pages.dev', W / 2, dcY + descH + 30)
 
   return canvas
 }
@@ -553,24 +604,15 @@ function ResultsScreen({ answers, onRestart }) {
     if (urls[platform]) window.open(urls[platform], '_blank', 'noopener,noreferrer')
   }
 
-  // Detect in-app browsers (KakaoTalk, Instagram, Line, …) that block Web Share / <a download>
-  const isInAppBrowser = /KAKAO|KAKAOTALK|Line\/|Instagram|FBAV|FBAN|Snapchat/i.test(navigator.userAgent)
-
   // Synchronous — no await before navigator.share, preserves iOS/Android user gesture context
   const handleDownload = () => {
     if (!imgReady) return
     const file = shareFileRef.current
     const blobUrl = shareBlobUrlRef.current
 
-    // KakaoTalk / in-app browsers block both navigator.share(files) and <a download>.
-    // Opening the blob URL as a new page lets the user long-press → Save on Android/iOS.
-    if (isInAppBrowser) {
-      window.open(blobUrl, '_blank', 'noopener')
-      return
-    }
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      // iOS Safari 15+ & Android Chrome: native share sheet → "Save Image" / "Save to Photos"
+    // iOS Safari 15+ & Android Chrome/WebView: native share sheet → "Save Image"
+    // Most in-app browsers (KakaoTalk, Instagram) also support this via the platform WebView.
+    if (navigator.canShare?.({ files: [file] })) {
       navigator.share({ files: [file], title: 'My ThisOrThat Result' }).catch(e => {
         if (e.name !== 'AbortError') triggerDownload(blobUrl)
       })
@@ -733,7 +775,7 @@ function ResultsScreen({ answers, onRestart }) {
                 className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[18px]">{imgReady ? 'download' : 'hourglass_empty'}</span>
-                {imgReady ? (isInAppBrowser ? 'Save (long-press)' : 'Save') : '...'}
+                {imgReady ? 'Save' : '...'}
               </button>
               <button
                 onClick={handleCopyLink}
