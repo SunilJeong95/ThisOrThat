@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import html2canvas from 'html2canvas'
 
 const AVATAR_URLS = [
   'https://lh3.googleusercontent.com/aida-public/AB6AXuACOffwaPSA48nJlMY5OPZeWi-S5pu-bxuKbjdUrcqSLWWGqQ6rkUwvVv8rHVqk84sYv3Uwxv5m0rFf7_BM3YKWsNrMEJA7FenBE65mRzqeVUtl__SBoveKlpJPCvti75vW_tiiDB4x6Wf4nYdqb4WfhNMrUTuntQ82GDN2JciyiKl18zbJ7W632cXje6a3jSpjyIv_ujJs9A3RjptKFDoiIKB1II10ClB-_52EjIYHF8CTJPSRQOPNY6kwKcQIBuBOpGF3pqdhFPFk',
@@ -244,7 +245,12 @@ const questions = [
   },
 ]
 
+function encodeAnswers(answers) {
+  return answers.map(a => a === 'love' ? 'l' : 'h').join('')
+}
+
 function ResultsScreen({ answers, onRestart }) {
+  const resultCardRef = useRef(null)
   // S: Structural Integrity (Q1,Q3,Q8,Q9) — love = structured choice
   const S = [answers[0]==='love', answers[2]==='love', answers[7]==='love', answers[8]==='love'].filter(Boolean).length
   // E: Efficiency Pragmatism (Q5,Q6,Q10) — love = efficient choice
@@ -259,9 +265,10 @@ function ResultsScreen({ answers, onRestart }) {
   const archetype = ARCHETYPES.find(a => a.s === sHigh && a.e === eHigh && a.n === nHigh) ?? ARCHETYPES[0]
 
   const [copied, setCopied] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   const shareText = `I got '${archetype.name}' (${archetype.rarity}) on ThisOrThat! 😮 Try it yourself`
-  const shareUrl = window.location.href
+  const shareUrl = `${window.location.origin}/quiz?r=${encodeAnswers(answers)}`
 
   const handleShare = (platform) => {
     const encodedUrl = encodeURIComponent(shareUrl)
@@ -284,6 +291,30 @@ function ResultsScreen({ answers, onRestart }) {
       whatsapp: `https://api.whatsapp.com/send?text=${encodedFull}`,
     }
     if (urls[platform]) window.open(urls[platform], '_blank', 'noopener,noreferrer')
+  }
+
+  const handleDownload = async () => {
+    if (!resultCardRef.current || saving) return
+    setSaving(true)
+    try {
+      const canvas = await html2canvas(resultCardRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff' })
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+      const file = new File([blob], 'thisorthat-result.png', { type: 'image/png' })
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'My ThisOrThat Result' })
+      } else {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'thisorthat-result.png'
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+    } catch {
+      // 취소 또는 오류 시 무시
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleCopyLink = () => {
@@ -328,7 +359,7 @@ function ResultsScreen({ answers, onRestart }) {
         <div className="relative w-full max-w-[420px] flex flex-col gap-5 z-10">
 
           {/* Main result card */}
-          <div className="bg-white rounded-[2.5rem] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden">
+          <div ref={resultCardRef} className="bg-white rounded-[2.5rem] p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden">
 
             {/* Badge + Title */}
             <div className="text-center mb-6">
@@ -433,9 +464,13 @@ function ResultsScreen({ answers, onRestart }) {
               </button>
             </div>
             <div className="flex gap-3">
-              <button className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
-                <span className="material-symbols-outlined text-[18px]">download</span>
-                Save
+              <button
+                onClick={handleDownload}
+                disabled={saving}
+                className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-60"
+              >
+                <span className="material-symbols-outlined text-[18px]">{saving ? 'hourglass_empty' : 'download'}</span>
+                {saving ? 'Saving...' : 'Save'}
               </button>
               <button
                 onClick={handleCopyLink}
@@ -456,14 +491,32 @@ function ResultsScreen({ answers, onRestart }) {
   )
 }
 
+function decodeAnswers(encoded) {
+  if (!encoded || encoded.length !== 10 || !/^[lh]+$/.test(encoded)) return null
+  return encoded.split('').map(c => c === 'l' ? 'love' : 'hate')
+}
+
 export default function QuizPage() {
   const navigate = useNavigate()
   const [currentIdx, setCurrentIdx] = useState(0)
   const [answers, setAnswers] = useState([])
   const [exitDir, setExitDir] = useState(null) // null | 'left' | 'right'
-  const [isDone, setIsDone] = useState(false)
+  const [isDone, setIsDone] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    return !!decodeAnswers(params.get('r'))
+  })
   const [hoveredSide, setHoveredSide] = useState(null) // 'left' | 'right' | null
   const [voteCounts, setVoteCounts] = useState({}) // { q1: { left, right }, ... }
+
+  // URL 파라미터로 결과 직접 로드
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const decoded = decodeAnswers(params.get('r'))
+    if (decoded) {
+      setAnswers(decoded)
+      setIsDone(true)
+    }
+  }, [])
 
   // Preload all quiz images + fetch vote counts on mount
   useEffect(() => {
@@ -482,6 +535,12 @@ export default function QuizPage() {
   const question = questions[currentIdx]
   const nextQuestion = questions[currentIdx + 1]
   const progress = (answers.length / questions.length) * 100
+
+  const handleBack = useCallback(() => {
+    if (currentIdx === 0 || exitDir !== null) return
+    setAnswers(prev => prev.slice(0, -1))
+    setCurrentIdx(i => i - 1)
+  }, [currentIdx, exitDir])
 
   const handleAnswer = useCallback((answer) => {
     if (exitDir !== null || isDone) return
@@ -555,9 +614,19 @@ export default function QuizPage() {
         {/* Progress bar */}
         <div className="w-full max-w-md mb-5 md:mb-6 flex flex-col gap-2">
           <div className="flex justify-between items-center px-1">
-            <span className="text-sm font-bold text-[#0ea5e9] uppercase tracking-wider bg-[#0ea5e9]/10 px-3 py-0.5 rounded-full">
-              Quirk {answers.length + 1} of {questions.length}
-            </span>
+            <div className="flex items-center gap-2">
+              {currentIdx > 0 && (
+                <button
+                  onClick={handleBack}
+                  className="flex items-center justify-center size-7 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors text-slate-500"
+                >
+                  <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                </button>
+              )}
+              <span className="text-sm font-bold text-[#0ea5e9] uppercase tracking-wider bg-[#0ea5e9]/10 px-3 py-0.5 rounded-full">
+                Quirk {answers.length + 1} of {questions.length}
+              </span>
+            </div>
             {nextQuestion && (
               <span className="text-xs font-medium text-slate-400 truncate max-w-[160px]">
                 Next: {nextQuestion.title}

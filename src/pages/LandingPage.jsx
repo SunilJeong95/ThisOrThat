@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const BASE_COUNT = 2
 
 function HeroSection({ onStart }) {
-  const [visitorCount, setVisitorCount] = useState(null)
+  const [visitorCount, setVisitorCount] = useState(BASE_COUNT)
 
   useEffect(() => {
     let sessionId = sessionStorage.getItem('tot_session')
@@ -20,9 +21,9 @@ function HeroSection({ onStart }) {
           body: JSON.stringify({ sessionId }),
         })
         const data = await res.json()
-        setVisitorCount(data.count)
+        setVisitorCount(BASE_COUNT + (data.count || 0))
       } catch {
-        // API 미사용 환경(vite dev)에서는 카운터 숨김
+        // dev 환경 등 API 없을 때는 기본값 유지
       }
     }
 
@@ -30,10 +31,7 @@ function HeroSection({ onStart }) {
     const interval = setInterval(heartbeat, 45000)
 
     const onLeave = () => {
-      navigator.sendBeacon(
-        '/api/presence',
-        JSON.stringify({ sessionId, leaving: true })
-      )
+      navigator.sendBeacon('/api/presence', JSON.stringify({ sessionId, leaving: true }))
     }
     window.addEventListener('beforeunload', onLeave)
 
@@ -50,14 +48,10 @@ function HeroSection({ onStart }) {
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0EA5E9] opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0EA5E9]"></span>
         </span>
-        {visitorCount !== null ? (
-          <span className="text-sm font-bold tracking-wide">
-            <span className="text-2xl font-black text-[#0EA5E9]">{visitorCount.toLocaleString()}</span>
-            {' '}people taking the test right now
-          </span>
-        ) : (
-          <span className="text-xs font-bold tracking-wide uppercase">Live</span>
-        )}
+        <span className="text-sm font-bold tracking-wide">
+          <span className="text-xl font-black text-[#0EA5E9]">{visitorCount.toLocaleString()}</span>
+          {' '}live
+        </span>
       </div>
 
       <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1] mb-6 text-slate-900 drop-shadow-sm max-w-4xl mx-auto">
@@ -82,29 +76,6 @@ function HeroSection({ onStart }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl px-4">
-        <div className="bg-white border border-slate-100 p-6 rounded-2xl flex flex-col items-center md:items-start hover:shadow-lg hover:border-slate-200 transition-all shadow-sm">
-          <div className="p-3 bg-blue-50 rounded-xl text-[#0EA5E9] mb-4">
-            <span className="material-symbols-outlined">fingerprint</span>
-          </div>
-          <div className="text-3xl font-extrabold text-slate-800 mb-1">1.5M+</div>
-          <div className="text-sm text-slate-500 font-medium">Unique quirks analyzed</div>
-        </div>
-        <div className="bg-white border border-slate-100 p-6 rounded-2xl flex flex-col items-center md:items-start hover:shadow-lg hover:border-slate-200 transition-all shadow-sm">
-          <div className="p-3 bg-orange-50 rounded-xl text-[#F59E0B] mb-4">
-            <span className="material-symbols-outlined">public</span>
-          </div>
-          <div className="text-3xl font-extrabold text-slate-800 mb-1">192</div>
-          <div className="text-sm text-slate-500 font-medium">Countries scanned daily</div>
-        </div>
-        <div className="bg-white border border-slate-100 p-6 rounded-2xl flex flex-col items-center md:items-start hover:shadow-lg hover:border-slate-200 transition-all shadow-sm">
-          <div className="p-3 bg-yellow-50 rounded-xl text-yellow-600 mb-4">
-            <span className="material-symbols-outlined">favorite</span>
-          </div>
-          <div className="text-3xl font-extrabold text-slate-800 mb-1">500k+</div>
-          <div className="text-sm text-slate-500 font-medium">Soulmates connected</div>
-        </div>
-      </div>
     </main>
   )
 }
