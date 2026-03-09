@@ -130,8 +130,11 @@ function measureLines(ctx, text, maxWidth) {
 }
 
 async function generateShareImage(archetype, radar) {
-  // Ensure web fonts (Spline Sans) are ready before drawing
-  await document.fonts.ready
+  // Parallelize: font loading (with 1.5s timeout) + flag image fetch
+  const [, flagImg] = await Promise.all([
+    Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]),
+    loadTwemojiImg(archetype.flag),
+  ])
 
   const W = 900
   const FONT = '"Spline Sans", system-ui, sans-serif'
@@ -244,7 +247,6 @@ async function generateShareImage(archetype, radar) {
   y += RADAR_ZONE + 28
 
   // Country box
-  const flagImg = await loadTwemojiImg(archetype.flag)
   const cbX = OUTER + CARD_PX, cbW = W - OUTER * 2 - CARD_PX * 2
   drawRoundedRect(ctx, cbX, y, cbW, COUNTRY_H, 20)
   ctx.fillStyle = '#F8FAFC'; ctx.fill()
