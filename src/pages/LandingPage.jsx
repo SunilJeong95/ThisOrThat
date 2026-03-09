@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 const BASE_COUNT = 2
 
@@ -90,12 +90,12 @@ function Footer() {
           <span className="text-slate-700 font-bold text-lg">ThisOrThat</span>
         </div>
         <div className="flex flex-wrap justify-center gap-8">
-          <a className="text-slate-500 hover:text-[#0EA5E9] transition-colors text-sm font-medium" href="#">Privacy Policy</a>
-          <a className="text-slate-500 hover:text-[#0EA5E9] transition-colors text-sm font-medium" href="#">Terms of Service</a>
-          <a className="text-slate-500 hover:text-[#0EA5E9] transition-colors text-sm font-medium" href="#">Contact Us</a>
+          <Link className="text-slate-500 hover:text-[#0EA5E9] transition-colors text-sm font-medium" to="/about">About</Link>
+          <Link className="text-slate-500 hover:text-[#0EA5E9] transition-colors text-sm font-medium" to="/privacy">Privacy Policy</Link>
+          <Link className="text-slate-500 hover:text-[#0EA5E9] transition-colors text-sm font-medium" to="/contact">Contact Us</Link>
         </div>
         <div className="text-slate-400 text-sm font-medium">
-          © 2024 ThisOrThat. Stay weird.
+          © 2026 ThisOrThat. Stay weird.
         </div>
       </div>
     </footer>
