@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Twemoji CDN — consistent emoji rendering across all browsers/OS
@@ -444,8 +444,32 @@ function ResultsScreen({ answers, onRestart }) {
 
   const archetype = ARCHETYPES.find(a => a.s === sHigh && a.e === eHigh && a.n === nHigh) ?? ARCHETYPES[0]
 
+  const radar = {
+    chaos: (4 - S) / 4,
+    charm: N / 3,
+    wit: (S / 4 + E / 3) / 2,
+    chill: (3 - E) / 3,
+    weird: (3 - N) / 3,
+  }
+
   const [copied, setCopied] = useState(false)
-  const [saving, setSaving] = useState(false)
+  // Pre-generate share image on mount so handleDownload stays synchronous
+  // (navigator.share must be called within a user gesture — await before it breaks this on iOS/Android)
+  const shareFileRef = useRef(null)
+  const shareBlobUrlRef = useRef(null)
+  const [imgReady, setImgReady] = useState(false)
+
+  useEffect(() => {
+    generateShareImage(archetype, radar).then(canvas => {
+      canvas.toBlob(blob => {
+        if (!blob) return
+        shareFileRef.current = new File([blob], 'thisorthat-result.png', { type: 'image/png' })
+        shareBlobUrlRef.current = URL.createObjectURL(blob)
+        setImgReady(true)
+      }, 'image/png')
+    }).catch(() => {})
+    return () => { if (shareBlobUrlRef.current) URL.revokeObjectURL(shareBlobUrlRef.current) }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const shareText = `I got '${archetype.name}' (${archetype.rarity}) on ThisOrThat! 😮 Try it yourself`
   const shareUrl = `${window.location.origin}/quiz?r=${encodeAnswers(answers)}`
@@ -473,30 +497,29 @@ function ResultsScreen({ answers, onRestart }) {
     if (urls[platform]) window.open(urls[platform], '_blank', 'noopener,noreferrer')
   }
 
-  const handleDownload = async () => {
-    if (saving) return
-    setSaving(true)
-    try {
-      const canvas = await generateShareImage(archetype, radar)
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
-      const file = new File([blob], 'thisorthat-result.png', { type: 'image/png' })
-      // iOS & Android: Web Share API with file → native share sheet → "Save Image" / "Save to Photos"
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'My ThisOrThat Result' })
-      } else {
-        // Desktop fallback
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'thisorthat-result.png'
-        a.click()
-        URL.revokeObjectURL(url)
-      }
-    } catch {
-      // 사용자 취소 또는 오류 시 무시
-    } finally {
-      setSaving(false)
+  // Synchronous — no await before navigator.share, preserves iOS/Android user gesture context
+  const handleDownload = () => {
+    if (!imgReady) return
+    const file = shareFileRef.current
+    const blobUrl = shareBlobUrlRef.current
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      // iOS 15+ & Android Chrome: opens native share sheet → "Save Image" / "Save to Photos"
+      navigator.share({ files: [file], title: 'My ThisOrThat Result' }).catch(e => {
+        if (e.name !== 'AbortError') triggerDownload(blobUrl)
+      })
+    } else {
+      triggerDownload(blobUrl)
     }
+  }
+
+  const triggerDownload = (blobUrl) => {
+    const a = document.createElement('a')
+    a.href = blobUrl
+    a.download = 'thisorthat-result.png'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
   }
 
   const handleCopyLink = () => {
@@ -504,14 +527,6 @@ function ResultsScreen({ answers, onRestart }) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
-  }
-
-  const radar = {
-    chaos: (4 - S) / 4,
-    charm: N / 3,
-    wit: (S / 4 + E / 3) / 2,
-    chill: (3 - E) / 3,
-    weird: (3 - N) / 3,
   }
 
   return (
@@ -648,11 +663,11 @@ function ResultsScreen({ answers, onRestart }) {
             <div className="flex gap-3">
               <button
                 onClick={handleDownload}
-                disabled={saving}
-                className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-60"
+                disabled={!imgReady}
+                className="flex-1 h-12 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
-                <span className="material-symbols-outlined text-[18px]">{saving ? 'hourglass_empty' : 'download'}</span>
-                {saving ? 'Saving...' : 'Save'}
+                <span className="material-symbols-outlined text-[18px]">{imgReady ? 'download' : 'hourglass_empty'}</span>
+                {imgReady ? 'Save' : '...'}
               </button>
               <button
                 onClick={handleCopyLink}
