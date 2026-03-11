@@ -943,6 +943,7 @@ export default function QuizPage() {
   })
   const [hoveredSide, setHoveredSide] = useState(null) // 'left' | 'right' | null
   const [voteCounts, setVoteCounts] = useState({}) // { q1: { left, right }, ... }
+  const [imagesLoaded, setImagesLoaded] = useState(false)
 
   // URL 파라미터로 결과 직접 로드
   useEffect(() => {
@@ -956,9 +957,14 @@ export default function QuizPage() {
 
   // Preload all quiz images + fetch vote counts on mount
   useEffect(() => {
+    let loaded = 0
+    const total = questions.length * 2
+    const onLoad = () => { loaded++; if (loaded >= total) setImagesLoaded(true) }
     questions.forEach(q => {
       const l = new Image()
       const r = new Image()
+      l.onload = l.onerror = onLoad
+      r.onload = r.onerror = onLoad
       l.src = q.leftImg
       r.src = q.rightImg
     })
@@ -1032,6 +1038,25 @@ export default function QuizPage() {
 
   if (isDone) {
     return <ResultsScreen answers={answers} onRestart={() => navigate('/')} />
+  }
+
+  if (!imagesLoaded) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white" style={{ fontFamily: '"Spline Sans", sans-serif' }}>
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#0ea5e9]/10 blur-[100px] opacity-60" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#facc15]/20 blur-[100px] opacity-60" />
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#e2e8f0 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        </div>
+        <div className="relative z-10 flex flex-col items-center gap-5">
+          <svg className="animate-spin" width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="26" cy="26" r="22" stroke="#e2e8f0" strokeWidth="5" />
+            <path d="M48 26a22 22 0 0 0-22-22" stroke="#0ea5e9" strokeWidth="5" strokeLinecap="round" />
+          </svg>
+          <p className="text-slate-400 text-sm font-medium tracking-wide">퀴즈 불러오는 중…</p>
+        </div>
+      </div>
+    )
   }
 
   return (
