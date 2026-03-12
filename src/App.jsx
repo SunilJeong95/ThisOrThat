@@ -8,6 +8,8 @@ import BlogPage from './pages/BlogPage'
 import BlogArticle1 from './pages/blog/BlogArticle1'
 import BlogArticle2 from './pages/blog/BlogArticle2'
 import BlogArticle3 from './pages/blog/BlogArticle3'
+import HowItWorksPage from './pages/HowItWorksPage'
+import FaqPage from './pages/FaqPage'
 import './App.css'
 
 export default function App() {
@@ -23,6 +25,8 @@ export default function App() {
         <Route path="/blog/what-your-daily-habits-reveal-about-personality" element={<BlogArticle1 />} />
         <Route path="/blog/morning-shower-vs-night-shower" element={<BlogArticle2 />} />
         <Route path="/blog/why-personality-quizzes-are-so-popular" element={<BlogArticle3 />} />
+        <Route path="/how-it-works" element={<HowItWorksPage />} />
+        <Route path="/faq" element={<FaqPage />} />
       </Routes>
     </BrowserRouter>
   )
