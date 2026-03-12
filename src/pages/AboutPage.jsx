@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 export default function AboutPage() {
   const navigate = useNavigate()
@@ -96,6 +96,11 @@ export default function AboutPage() {
       </main>
 
       <footer className="border-t border-slate-100 py-8 px-6 text-center text-slate-400 text-sm">
+        <div className="flex justify-center gap-6 mb-3">
+          <Link to="/blog" className="hover:text-[#0EA5E9] transition-colors">Blog</Link>
+          <Link to="/privacy" className="hover:text-[#0EA5E9] transition-colors">Privacy Policy</Link>
+          <Link to="/contact" className="hover:text-[#0EA5E9] transition-colors">Contact</Link>
+        </div>
         © 2026 ThisOrThat. Stay weird.
       </footer>
     </div>

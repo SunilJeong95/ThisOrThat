@@ -13,7 +13,27 @@
   <url>
     <loc>https://thisorthat.pages.dev/about</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://thisorthat.pages.dev/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://thisorthat.pages.dev/blog/what-your-daily-habits-reveal-about-personality</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thisorthat.pages.dev/blog/morning-shower-vs-night-shower</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thisorthat.pages.dev/blog/why-personality-quizzes-are-so-popular</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://thisorthat.pages.dev/privacy</loc>
